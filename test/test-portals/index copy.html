@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>&#10086;&#3834;&#119985;&#119994;&#119890; &#119897;&#119834;&#119899;&#119890;&#3835;&#10086;</title>
+  <meta name="description" content="Zoe Lane - links, socials, art &amp; design.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.164.1/build/three.module.js","three/addons/":"https://unpkg.com/three@0.164.1/examples/jsm/"}}</script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+      background: #020000;
+      color: #c8b59b;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    #bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    #fade-bottom {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 38vh;
+      background: linear-gradient(to bottom, transparent, #000 88%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .ui {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 460px;
+      margin: 0 auto;
+      padding: 0 20px max(64px, env(safe-area-inset-bottom, 64px));
+      padding-top: 24vh;
+      pointer-events: none;
+    }
+    .ui > * { pointer-events: auto; }
+
+    .avatar-wrap { position: relative; }
+    .avatar {
+      width: 108px; height: 108px;
+      border-radius: 50%;
+      border: 2px solid rgba(140,28,48,.55);
+      object-fit: cover;
+      position: relative;
+      box-shadow:
+        0 0 0 4px rgba(100,15,38,.12),
+        0 0 28px rgba(122,21,48,.48),
+        0 0 60px rgba(122,21,48,.16),
+        0 12px 40px rgba(0,0,0,.75);
+    }
+
+    .username {
+      margin-top: 10px;
+      font-size: .82rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #ffffff;
+      -webkit-text-stroke: 0px;
+      text-shadow: none;
+    }
+
+    .socials { display: flex; gap: 18px; margin-top: 22px; }
+    .socials a {
+      display: flex; align-items: center; justify-content: center;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(100,15,38,.10);
+      border: 1px solid rgba(140,28,48,.30);
+      box-shadow: 0 0 14px rgba(100,15,38,.22), inset 0 1px 0 rgba(255,255,255,.05);
+      transition: background .2s, box-shadow .2s, transform .15s;
+      touch-action: manipulation;
+    }
+    .socials a:active {
+      background: rgba(140,28,48,.22);
+      box-shadow: 0 0 24px rgba(122,21,48,.55), 0 0 48px rgba(122,21,48,.18), inset 0 1px 0 rgba(255,255,255,.07);
+      transform: scale(.92);
+    }
+    @media (hover: hover) {
+      .socials a:hover { background: rgba(140,28,48,.16); box-shadow: 0 0 22px rgba(122,21,48,.44); }
+    }
+    .socials svg { width: 20px; height: 20px; fill: rgba(200,181,155,.80); }
+
+    .links { width: 100%; margin-top: 28px; display: flex; flex-direction: column; gap: 14px; }
+
+    .link-btn {
+      position: relative;
+      display: flex; align-items: center;
+      width: 100%; min-height: 76px;
+      background: rgba(5,1,2,.68);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(140,28,48,.34);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(140,28,48,.06),
+        0 2px 4px rgba(0,0,0,.9),
+        0 8px 32px rgba(100,15,38,.20),
+        0 28px 56px rgba(100,15,38,.06),
+        inset 0 1px 0 rgba(255,255,255,.05),
+        inset 0 -1px 0 rgba(0,0,0,.55);
+      transform: perspective(900px) translateZ(0);
+      transition: transform .18s ease, box-shadow .18s ease;
+      touch-action: manipulation;
+      cursor: pointer;
+    }
+    .link-btn::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,.04) 0%, transparent 100%);
+      border-radius: 18px 18px 0 0;
+      pointer-events: none;
+    }
+    .link-btn::after {
+      content: '';
+      position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(204,24,69,.52), transparent);
+      pointer-events: none;
+    }
+    .link-btn:active {
+      transform: perspective(900px) translateY(2px) rotateX(4deg) scale(.982);
+      box-shadow:
+        0 0 0 1px rgba(140,28,48,.13),
+        0 1px 2px rgba(0,0,0,.95),
+        0 4px 16px rgba(100,15,38,.30),
+        0 14px 40px rgba(100,15,38,.10),
+        inset 0 1px 0 rgba(255,255,255,.03),
+        inset 0 -1px 0 rgba(0,0,0,.75);
+    }
+    @media (hover: hover) {
+      .link-btn:hover {
+        transform: perspective(900px) translateY(-4px) translateZ(4px);
+        box-shadow:
+          0 0 0 1px rgba(140,28,48,.11),
+          0 6px 24px rgba(0,0,0,.6),
+          0 14px 48px rgba(100,15,38,.28),
+          0 32px 64px rgba(100,15,38,.09),
+          inset 0 1px 0 rgba(255,255,255,.06),
+          inset 0 -1px 0 rgba(0,0,0,.5);
+      }
+    }
+    .link-btn__thumb {
+      width: 70px; height: 70px; object-fit: cover;
+      border-radius: 12px; margin: 3px; flex-shrink: 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,.65);
+    }
+    .link-btn__icon {
+      width: 70px; height: 70px; border-radius: 12px; margin: 3px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.9rem;
+      background: rgba(100,15,38,.13);
+    }
+    .link-btn__text {
+      flex: 1; text-align: center;
+      font-size: .80rem; font-weight: 400;
+      letter-spacing: .16em; text-transform: uppercase;
+      padding: 0 10px;
+      color: rgba(200,181,155,.88);
+    }
+    .link-btn__spacer { width: 70px; flex-shrink: 0; }
+
+    #loader {
+      position: fixed; inset: 0; z-index: 10;
+      background: #020000;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity .9s ease;
+    }
+    #loader.fade { opacity: 0; pointer-events: none; }
+    .loader-ring {
+      width: 36px; height: 36px;
+      border: 2px solid rgba(100,15,38,.28);
+      border-top-color: rgba(204,24,69,.78);
+      border-radius: 50%;
+      animation: spin .9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body>
+  <div id="loader"><div class="loader-ring"></div></div>
+  <canvas id="bg"></canvas>
+  <div id="fade-bottom"></div>
+
+  <div class="ui">
+
+    <div class="avatar-wrap">
+      <img class="avatar" src="assets/images/bio/avatar.jpg" alt="Zoe Lane">
+    </div>
+    <p class="username">@solelyzoelane</p>
+
+    <nav class="socials" aria-label="Social links">
+      <a href="https://www.instagram.com/solelyzoelane" target="_blank" rel="noreferrer noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm5.25-2.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z"/></svg>
+      </a>
+      <a href="https://www.tiktok.com/@solelyzoelane" target="_blank" rel="noreferrer noopener" aria-label="TikTok">
+        <svg viewBox="0 0 24 24"><path d="M16.6 5.82A4.278 4.278 0 0 1 13.81 3h-3.09v12.4a2.592 2.592 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.59a2.59 2.59 0 0 1 2.6-2.59c.27 0 .53.04.77.12V9.7a6.126 6.126 0 0 0-.77-.05 5.96 5.96 0 0 0-5.96 5.96 5.96 5.96 0 0 0 5.96 5.96 5.96 5.96 0 0 0 5.96-5.96V9.01a7.61 7.61 0 0 0 4.51 1.47V7.4a4.28 4.28 0 0 1-1.94-.58Z"/></svg>
+      </a>
+      <a href="mailto:solelyzoelane@gmail.com" aria-label="Email">
+        <svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 2-8 5-8-5Zm0 12H4V8l8 5 8-5Z"/></svg>
+      </a>
+    </nav>
+
+    <div class="links">
+      <a class="link-btn" href="art/" rel="noreferrer noopener">
+        <img class="link-btn__thumb" src="assets/images/bio/art-thumbnail.jpg" alt="Art thumbnail">
+        <span class="link-btn__text">zoelaneart &middot; art &amp; design</span>
+        <span class="link-btn__spacer" aria-hidden="true"></span>
+      </a>
+      <a class="link-btn" href="a-look-into-my-life/">
+        <span class="link-btn__icon" aria-hidden="true">&#10086;</span>
+        <span class="link-btn__text">a look into my life</span>
+        <span class="link-btn__spacer" aria-hidden="true"></span>
+      </a>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import * as THREE          from 'three';
+    import { FontLoader }      from 'three/addons/loaders/FontLoader.js';
+    import { TextGeometry }    from 'three/addons/geometries/TextGeometry.js';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+    import { EffectComposer }  from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass }      from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+    import { OutputPass }      from 'three/addons/postprocessing/OutputPass.js';
+
+    /* ---- SETUP ---- */
+    const isMobile = innerWidth < 700 || /Android|iPhone|iPad/i.test(navigator.userAgent);
+    const canvas   = document.getElementById('bg');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: !isMobile });
+    renderer.setPixelRatio(isMobile ? 1 : Math.min(devicePixelRatio, 2));
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.toneMapping         = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.3;
+
+    const pmrem  = new THREE.PMREMGenerator(renderer);
+    const envMap = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+    const scene = new THREE.Scene();
+    scene.background           = new THREE.Color(0x020000);
+    scene.environment          = envMap;
+    scene.environmentIntensity = 0.30;
+    scene.fog = new THREE.FogExp2(0x060000, 0.022);
+
+    const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 80);
+    camera.position.set(0, 0, 7.5);
+
+    /* ---- POST-PROCESSING ---- */
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    composer.addPass(new UnrealBloomPass(
+      new THREE.Vector2(innerWidth, innerHeight),
+      isMobile ? 0.9 : 1.2, 0.52, 0.28
+    ));
+    composer.addPass(new OutputPass());
+
+    /* ---- LIGHTS ---- */
+    scene.add(new THREE.AmbientLight(0x0d0308, 2.0));
+    const key = new THREE.DirectionalLight(0xfff0ee, 4.0);
+    key.position.set(-3, 6, 4); scene.add(key);
+    const rim = new THREE.PointLight(0x5c0018, 9.75, 14);
+    rim.position.set(3, -3, 3); scene.add(rim);
+    const up = new THREE.PointLight(0xbb0835, 3.9, 12);
+    up.position.set(0, -5, 2); scene.add(up);
+
+    /* ---- PARTICLE RING (avatar orbit) ---- */
+    const halfH3D    = Math.tan(Math.PI / 6) * 7.5;
+    const pxToWorld  = (2 * halfH3D) / innerHeight;
+    const avCenterPx = 0.24 * innerHeight + 54;
+    const RING_Y     = halfH3D - avCenterPx * pxToWorld;
+    const RING_R     = 62 * pxToWorld;
+
+    const RING_N    = isMobile ? 3200 : 5800;
+    const ringPos   = new Float32Array(RING_N * 3);
+    // Per-particle orbit + drift data
+    const rPhase    = new Float32Array(RING_N);
+    const rSpeed    = new Float32Array(RING_N);
+    const rRadOff   = new Float32Array(RING_N);
+    const rScatter  = new Float32Array(RING_N);
+    const rDrift    = new Float32Array(RING_N * 3); // drift phase per axis
+    for (let i = 0; i < RING_N; i++) {
+      rPhase[i]     = Math.random() * Math.PI * 2;
+      rSpeed[i]     = 0.14 + Math.random() * 0.18;     // each particle drifts at its own speed
+      rRadOff[i]    = (Math.random() - 0.5) * 0.03;   // tiny push in/out from ring radius
+      rScatter[i]   = Math.random() * Math.random() * 0.09; // squared: most tight, few wispy outliers
+      rDrift[i*3]   = Math.random() * Math.PI * 2;
+      rDrift[i*3+1] = Math.random() * Math.PI * 2;
+      rDrift[i*3+2] = Math.random() * Math.PI * 2;
+    }
+
+    // Soft gaussian texture so each point looks like a glowing dust mote
+    const ptCvs = document.createElement('canvas');
+    ptCvs.width = ptCvs.height = 32;
+    const ptCtx = ptCvs.getContext('2d');
+    const ptGrad = ptCtx.createRadialGradient(16,16,0, 16,16,16);
+    ptGrad.addColorStop(0,   'rgba(255,255,255,1)');
+    ptGrad.addColorStop(0.4, 'rgba(255,255,255,0.4)');
+    ptGrad.addColorStop(1,   'rgba(255,255,255,0)');
+    ptCtx.fillStyle = ptGrad;
+    ptCtx.fillRect(0, 0, 32, 32);
+
+    const ringGeo = new THREE.BufferGeometry();
+    ringGeo.setAttribute('position', new THREE.BufferAttribute(ringPos, 3));
+    const ringMat = new THREE.PointsMaterial({
+      color: 0xcc1845, size: 0.018, sizeAttenuation: true,
+      map: new THREE.CanvasTexture(ptCvs),
+      transparent: true, opacity: 0.55,
+      blending: THREE.AdditiveBlending, depthWrite: false,
+      alphaTest: 0.001,
+    });
+    const ringPoints = new THREE.Points(ringGeo, ringMat);
+    scene.add(ringPoints);
+
+    /* ---- PARTICLES ---- */
+    const COUNT = isMobile ? 1600 : 3000;
+    const bPos = [], bScales = [], bColors = [];
+    const cBase   = new THREE.Color(0x1a0505);
+    const cAccent = new THREE.Color(0x881035);
+    const cBright = new THREE.Color(0xcc1845);
+
+    for (let i = 0; i < COUNT; i++) {
+      let x, y, z;
+      const r = Math.random();
+      if (r < 0.18) {
+        // Halo around text zone — wider spread
+        x = (Math.random() - 0.5) * 8;
+        y = 1.0 + Math.random() * 4.0;
+        z = (Math.random() - 0.5) * 2.5;
+      } else if (r < 0.55) {
+        // Mid-field — more breathing room
+        x = (Math.random() - 0.5) * 13;
+        y = (Math.random() - 0.5) * 11;
+        z = (Math.random() - 0.5) * 6 - 1;
+      } else {
+        // Wide background
+        x = (Math.random() - 0.5) * 20;
+        y = (Math.random() - 0.5) * 18;
+        z = (Math.random() - 0.5) * 11 - 3;
+      }
+      bPos.push(x, y, z);
+      bScales.push(0.012 + Math.random() * 0.014 + (Math.random() < 0.04 ? 0.012 : 0));
+      const cr = Math.random();
+      const c  = new THREE.Color();
+      if (cr < 0.70)      c.copy(cBase).lerp(cAccent, Math.random() * 0.32);
+      else if (cr < 0.90) c.copy(cAccent);
+      else                c.copy(cBright);
+      bColors.push(c.r, c.g, c.b);
+    }
+
+    const PCNT    = bPos.length / 3;
+    const beadGeo = new THREE.IcosahedronGeometry(1, isMobile ? 1 : 2);
+    const beadMat = new THREE.MeshPhysicalMaterial({
+      color: 0x1a0808, roughness: 0.08, metalness: 0.85,
+      envMapIntensity: 2.2, clearcoat: 1.0, clearcoatRoughness: 0.02,
+    });
+    const iMesh   = new THREE.InstancedMesh(beadGeo, beadMat, PCNT);
+    const dummy   = new THREE.Object3D();
+    const origPos = new Float32Array(PCNT * 3);
+    const iColors = new Float32Array(PCNT * 3);
+
+    for (let i = 0; i < PCNT; i++) {
+      const x = bPos[i*3], y = bPos[i*3+1], z = bPos[i*3+2];
+      origPos[i*3] = x; origPos[i*3+1] = y; origPos[i*3+2] = z;
+      dummy.position.set(x, y, z);
+      dummy.scale.setScalar(bScales[i]);
+      dummy.rotation.set(Math.random()*6, Math.random()*6, Math.random()*6);
+      dummy.updateMatrix();
+      iMesh.setMatrixAt(i, dummy.matrix);
+      iColors[i*3]   = bColors[i*3];
+      iColors[i*3+1] = bColors[i*3+1];
+      iColors[i*3+2] = bColors[i*3+2];
+    }
+    iMesh.instanceMatrix.needsUpdate = true;
+    iMesh.instanceColor = new THREE.InstancedBufferAttribute(iColors, 3);
+    scene.add(iMesh);
+
+    // Emissive glow beads
+    const GCNT    = Math.floor(PCNT * 0.038);
+    const glowMat = new THREE.MeshStandardMaterial({
+      color: 0x000000, emissive: new THREE.Color(0xcc1845),
+      emissiveIntensity: 2.93, transparent: true, opacity: 0.9,
+    });
+    const gMesh = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 1), glowMat, GCNT);
+    const glowIdxArr = new Int32Array(GCNT);
+    const glowScales = new Float32Array(GCNT);
+    for (let i = 0; i < GCNT; i++) {
+      const idx = Math.floor(Math.random() * PCNT);
+      glowIdxArr[i] = idx;
+      const gs = bScales[idx] * 0.73;  // half original size
+      glowScales[i] = gs;
+      dummy.position.set(origPos[idx*3], origPos[idx*3+1], origPos[idx*3+2]);
+      dummy.scale.setScalar(gs);
+      dummy.updateMatrix();
+      gMesh.setMatrixAt(i, dummy.matrix);
+    }
+    gMesh.instanceMatrix.needsUpdate = true;
+    scene.add(gMesh);
+
+    // Sparkle system — tiny bright additive star-flecks
+    const SPARK     = 320;
+    const sparkPos  = new Float32Array(SPARK * 3);
+    const sparkPhase = new Float32Array(SPARK);
+    for (let i = 0; i < SPARK; i++) {
+      sparkPos[i*3]   = (Math.random()-0.5) * 11;
+      sparkPos[i*3+1] = (Math.random()-0.5) * 11 + 1.5;
+      sparkPos[i*3+2] = (Math.random()-0.5) * 6;
+      sparkPhase[i]   = Math.random() * Math.PI * 2;
+    }
+    const sparkGeo = new THREE.BufferGeometry();
+    sparkGeo.setAttribute('position', new THREE.BufferAttribute(sparkPos, 3));
+    const sparkMat = new THREE.PointsMaterial({
+      color: 0xffbbcc, size: isMobile ? 0.020 : 0.026,
+      transparent: true, opacity: 0.0,
+      blending: THREE.AdditiveBlending, depthWrite: false,
+    });
+    const sparkPoints = new THREE.Points(sparkGeo, sparkMat);
+    scene.add(sparkPoints);
+
+    // Ambient dust
+    const DUST    = 220;
+    const dustPos = new Float32Array(DUST * 3);
+    for (let i = 0; i < DUST; i++) {
+      dustPos[i*3]   = (Math.random()-0.5) * 18;
+      dustPos[i*3+1] = (Math.random()-0.5) * 18;
+      dustPos[i*3+2] = (Math.random()-0.5) * 10 - 3;
+    }
+    const dustGeo = new THREE.BufferGeometry();
+    dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
+    scene.add(new THREE.Points(dustGeo, new THREE.PointsMaterial({
+      color: 0x660818, size: 0.016, transparent: true, opacity: 0.32,
+      blending: THREE.AdditiveBlending, depthWrite: false,
+    })));
+
+    // Reflective ground
+    const gnd = new THREE.Mesh(
+      new THREE.PlaneGeometry(22, 22),
+      new THREE.MeshPhysicalMaterial({
+        color: 0x040008, roughness: 0.12, metalness: 0.9,
+        envMapIntensity: 0.8, transparent: true, opacity: 0.32,
+      })
+    );
+    gnd.rotation.x = -Math.PI / 2;
+    gnd.position.y = -6.5;
+    scene.add(gnd);
+
+    /* ---- 3D TEXT ---- */
+    let textGroup    = null;
+    const TEXT_Y = 3.2;
+
+    new FontLoader().load(
+      'https://unpkg.com/three@0.164.1/examples/fonts/helvetiker_bold.typeface.json',
+      (font) => {
+        const sz = isMobile ? 0.42 : 0.54;
+
+        // Main glossy obsidian text
+        const geo = new TextGeometry('ZOE  LANE', {
+          font, size: sz, depth: 0.07,
+          curveSegments: isMobile ? 5 : 8,
+          bevelEnabled: true, bevelThickness: 0.014, bevelSize: 0.008,
+          bevelSegments: isMobile ? 2 : 3,
+        });
+        geo.computeBoundingBox();
+        const cx = -0.5 * (geo.boundingBox.max.x - geo.boundingBox.min.x);
+        const mainMesh = new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({
+          color: 0x0d0105, roughness: 0.55, metalness: 0.4,
+          envMapIntensity: 0.0, clearcoat: 0.0, clearcoatRoughness: 0.0,
+        }));
+        mainMesh.position.x = cx;
+
+        // Soft white outline glow — slightly enlarged copy behind the letters
+        const glowGeo = new TextGeometry('ZOE  LANE', {
+          font, size: sz * 1.055, depth: 0.02, curveSegments: 24,
+          bevelEnabled: false,
+        });
+        glowGeo.computeBoundingBox();
+        const gcx = -0.5 * (glowGeo.boundingBox.max.x - glowGeo.boundingBox.min.x);
+        const outlineMesh = new THREE.Mesh(glowGeo, new THREE.MeshBasicMaterial({
+          color: 0xffffff,
+          transparent: true, opacity: 0.18,
+        }));
+        outlineMesh.position.x = gcx;
+        outlineMesh.position.z = 0.08;
+
+        textGroup = new THREE.Group();
+        textGroup.add(mainMesh, outlineMesh);
+        textGroup.position.y = TEXT_Y;
+        scene.add(textGroup);
+      }
+    );
+
+    // Fade loader after 1.4s regardless of font load timing
+    setTimeout(() => {
+      const ld = document.getElementById('loader');
+      if (ld) { ld.classList.add('fade'); setTimeout(() => ld.remove(), 1000); }
+    }, 1400);
+
+    /* ---- TOUCH / MOUSE ---- */
+    const pointer     = new THREE.Vector2();
+    const raycaster   = new THREE.Raycaster();
+    const interPlane  = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+    const interTarget = new THREE.Vector3();
+    const touch3D     = new THREE.Vector3(999, 999, 0);
+
+    function updatePointer(cx, cy) {
+      pointer.x =  (cx / innerWidth)  * 2 - 1;
+      pointer.y = -(cy / innerHeight) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+      if (raycaster.ray.intersectPlane(interPlane, interTarget)) touch3D.copy(interTarget);
+    }
+    window.addEventListener('mousemove', e => updatePointer(e.clientX, e.clientY));
+    window.addEventListener('mouseleave', () => touch3D.set(999, 999, 0));
+    window.addEventListener('touchmove', e => updatePointer(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+    window.addEventListener('touchend', () => touch3D.set(999, 999, 0));
+
+    /* ---- RESIZE ---- */
+    window.addEventListener('resize', () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+      composer.setSize(innerWidth, innerHeight);
+    });
+
+    /* ---- ANIMATION ---- */
+    let t = 0;
+    const _m4 = new THREE.Matrix4();
+    const _p  = new THREE.Vector3();
+    const _s  = new THREE.Vector3();
+    const _q  = new THREE.Quaternion();
+
+    function animate(now) {
+      requestAnimationFrame(animate);
+      t = now * 0.001;
+
+      // Rim light slow orbit
+      rim.position.x = Math.cos(t * 0.12) * 5;
+      rim.position.z = Math.sin(t * 0.12) * 3;
+
+      // Particle drift + touch repulsion
+      for (let i = 0; i < PCNT; i++) {
+        const ox = origPos[i*3], oy = origPos[i*3+1], oz = origPos[i*3+2];
+        const d  = t * (0.04 + (i % 9) * 0.006);
+        let px = ox + Math.sin(d * 0.7 + oz * 0.8) * 0.09;
+        let py = oy + Math.cos(d * 0.5 + ox * 0.7) * 0.09;
+        let pz = oz + Math.sin(d * 0.35) * 0.055;
+        const dx = px - touch3D.x, dy = py - touch3D.y, dz = pz - touch3D.z;
+        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+        if (dist < 1.4) {
+          const f = (1.4 - dist) * 0.28 / (dist + 0.01);
+          px += dx * f; py += dy * f; pz += dz * f;
+        }
+        iMesh.getMatrixAt(i, _m4);
+        _m4.decompose(_p, _q, _s);
+        _p.set(px, py, pz);
+        _m4.compose(_p, _q, _s);
+        iMesh.setMatrixAt(i, _m4);
+      }
+      iMesh.instanceMatrix.needsUpdate = true;
+
+      // Animate glow beads — each drifts independently with scale sparkle
+      for (let i = 0; i < GCNT; i++) {
+        const idx = glowIdxArr[i];
+        const ox  = origPos[idx*3], oy = origPos[idx*3+1], oz = origPos[idx*3+2];
+        const d   = t * (0.07 + (i % 7) * 0.009) + i * 0.42;
+        const px  = ox + Math.sin(d * 1.1 + oz * 1.3) * 0.16;
+        const py  = oy + Math.cos(d * 0.8 + ox * 0.9) * 0.16;
+        const pz  = oz + Math.sin(d * 0.55 + oy) * 0.09;
+        // sparkle scale: each bead pulses at its own phase
+        const sparkle = 0.7 + Math.abs(Math.sin(d * 3.1 + sparkPhase[i % SPARK])) * 0.8;
+        dummy.position.set(px, py, pz);
+        dummy.scale.setScalar(glowScales[i] * sparkle);
+        dummy.updateMatrix();
+        gMesh.setMatrixAt(i, dummy.matrix);
+      }
+      gMesh.instanceMatrix.needsUpdate = true;
+
+      // Glow bead base emission pulse
+      glowMat.emissiveIntensity = 2.93 + Math.sin(t * 1.9) * 0.38;
+
+      // 3D text — static position
+      if (textGroup && !textGroup._posSet) {
+        textGroup.position.y = TEXT_Y;
+        textGroup._posSet = true;
+      }
+
+      // Sparkle flicker — compound sine gives organic twinkle
+      sparkMat.opacity = 0.28
+        + Math.sin(t * 3.7 + 0.5) * 0.12
+        + Math.sin(t * 9.1 + 1.2) * 0.06
+        + Math.sin(t * 17.3)      * 0.03;
+      const sAttr = sparkGeo.attributes.position;
+      for (let i = 0; i < SPARK; i++) {
+        sAttr.array[i*3+1] += 0.0009 + Math.sin(sparkPhase[i] + t * 0.4) * 0.0006;
+        sAttr.array[i*3]   += Math.sin(sparkPhase[i] * 2.1 + t * 0.22) * 0.0004;
+        if (sAttr.array[i*3+1] > 9) {
+          sAttr.array[i*3]   = (Math.random()-0.5) * 11;
+          sAttr.array[i*3+1] = -7;
+          sAttr.array[i*3+2] = (Math.random()-0.5) * 6;
+        }
+      }
+      sAttr.needsUpdate = true;
+
+      // Dust drift upward
+      const dAttr = dustGeo.attributes.position;
+      for (let i = 0; i < DUST; i++) {
+        dAttr.array[i*3+1] += 0.0014;
+        if (dAttr.array[i*3+1] > 9) {
+          dAttr.array[i*3]   = (Math.random()-0.5) * 18;
+          dAttr.array[i*3+1] = -9;
+          dAttr.array[i*3+2] = (Math.random()-0.5) * 10 - 3;
+        }
+      }
+      dAttr.needsUpdate = true;
+
+      // Wispy dust cloud ring around avatar
+      const rAttr = ringGeo.attributes.position;
+      for (let i = 0; i < RING_N; i++) {
+        const angle = rPhase[i] + t * rSpeed[i];
+        const r     = RING_R + rRadOff[i];
+        // base circular position
+        const bx = Math.cos(angle) * r;
+        const by = Math.sin(angle) * r;
+        // soft scatter drifts slowly — gives the wispy cloud spread
+        const sc = rScatter[i];
+        const dx = Math.sin(rDrift[i*3]   + t * 0.28) * sc;
+        const dy = Math.sin(rDrift[i*3+1] + t * 0.21) * sc;
+        const dz = Math.sin(rDrift[i*3+2] + t * 0.35) * sc * 2.2;
+        rAttr.array[i*3]   = bx + dx;
+        rAttr.array[i*3+1] = RING_Y + by + dy;
+        rAttr.array[i*3+2] = dz;
+      }
+      rAttr.needsUpdate = true;
+
+      composer.render();
+    }
+    animate(0);
+  </script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#020000">
+  <title>About | Zoe Lane Art</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'Cormorant Garamond', Georgia, serif;
+      background:#020000; color:#fff;
+      min-height:100vh; overflow-x:hidden;
+      -webkit-tap-highlight-color:transparent;
+      overscroll-behavior:none;
+    }
+
+    /* ── BACKGROUND ─────────────────────────── */
+    .bg-fixed {
+      position:fixed; inset:0; z-index:0;
+      background:linear-gradient(180deg,
+        #0a0a0a 0%,
+        #050505 30%,
+        #020000 60%,
+        #000000 100%);
+    }
+    .bg-fixed::after {
+      content:''; position:absolute; inset:0;
+      background:radial-gradient(ellipse at 50% 0%,
+        rgba(30,30,35,.4) 0%,
+        transparent 60%);
+    }
+
+    /* ── ICECAP GRADIENT GLOW ────────────────── */
+    .glow-top {
+      position:fixed; top:-120px; left:50%; transform:translateX(-50%);
+      width:800px; height:400px; z-index:1; pointer-events:none;
+      background:radial-gradient(ellipse at center,
+        rgba(180,220,240,.12) 0%,
+        rgba(140,200,230,.06) 30%,
+        rgba(100,180,220,.03) 50%,
+        transparent 70%);
+      animation:glowPulse 6s ease-in-out infinite;
+    }
+    @keyframes glowPulse {
+      0%,100%{ opacity:.6; transform:translateX(-50%) scale(1); }
+      50%{ opacity:1; transform:translateX(-50%) scale(1.08); }
+    }
+    .glow-bottom {
+      position:fixed; bottom:-80px; left:50%; transform:translateX(-50%);
+      width:600px; height:300px; z-index:1; pointer-events:none;
+      background:radial-gradient(ellipse at center,
+        rgba(160,210,235,.06) 0%,
+        rgba(120,190,220,.03) 40%,
+        transparent 65%);
+    }
+
+    /* ── NAV ─────────────────────────────────── */
+    .page-nav {
+      position:fixed; top:0; left:0; right:0; z-index:20;
+      padding:28px 28px 18px;
+      display:flex; align-items:center; justify-content:space-between;
+      background:linear-gradient(180deg, rgba(2,0,0,.8) 0%, transparent 100%);
+    }
+    .page-nav .nav-brand {
+      font-family:'Playfair Display', serif;
+      font-size:.97rem; letter-spacing:.3em; text-transform:uppercase;
+      color:rgba(255,255,255,.6); text-decoration:none;
+      transition:color .3s;
+    }
+    .page-nav .nav-brand:hover { color:#fff; }
+    .page-nav .nav-links {
+      display:flex; gap:24px;
+    }
+    .page-nav .nav-links a {
+      font-size:.77rem; letter-spacing:.18em; text-transform:uppercase;
+      color:rgba(255,255,255,.4); text-decoration:none;
+      transition:color .3s;
+    }
+    .page-nav .nav-links a:hover { color:rgba(255,255,255,.8); }
+    .page-nav .nav-links a.active { color:rgba(255,255,255,.75); border-bottom:1px solid rgba(255,255,255,.3); }
+
+    /* ── CONTENT ──────────────────────────────── */
+    .content {
+      position:relative; z-index:5;
+      max-width:800px; margin:0 auto;
+      padding:140px 28px 80px;
+    }
+
+    .about-header {
+      text-align:center; margin-bottom:60px;
+    }
+    .about-header h1 {
+      font-family:'Playfair Display', serif;
+      font-size:2rem; font-weight:400;
+      letter-spacing:.35em; text-transform:uppercase;
+      color:rgba(255,255,255,.85);
+      margin-bottom:12px;
+    }
+    .about-header .divider {
+      width:60px; height:1px; margin:0 auto;
+      background:linear-gradient(90deg,
+        transparent,
+        rgba(180,220,240,.4),
+        transparent);
+    }
+
+    .about-photo {
+      width:50%; max-height:350px; margin:0 auto 50px;
+      border-radius:4px; overflow:hidden;
+      box-shadow:none;
+    }
+    .about-photo img {
+      width:100%; height:100%; object-fit:cover;
+      display:block;
+      -webkit-mask-image:
+        linear-gradient(to right, transparent 0%, black 18%, black 82%, transparent 100%),
+        linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
+      -webkit-mask-composite: destination-in;
+      mask-image:
+        linear-gradient(to right, transparent 0%, black 18%, black 82%, transparent 100%),
+        linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
+      mask-composite: intersect;
+    }
+
+    .about-body p {
+      font-size:1.05rem; line-height:2;
+      color:rgba(255,255,255,.65);
+      margin-bottom:28px;
+      font-weight:300;
+    }
+    .about-body p:first-of-type::first-letter {
+      font-family:'Playfair Display', serif;
+      font-size:3.2rem; float:left;
+      line-height:1; margin-right:10px; margin-top:4px;
+      color:rgba(180,220,240,.5);
+    }
+
+    .about-signature {
+      margin-top:50px; text-align:right;
+      font-style:italic; font-size:.9rem;
+      color:rgba(255,255,255,.3);
+      letter-spacing:.1em;
+    }
+
+    /* ── FOOTER ───────────────────────────────── */
+    .page-footer {
+      position:relative; z-index:5;
+      text-align:center; padding:40px 20px 30px;
+      border-top:1px solid rgba(255,255,255,.04);
+    }
+    .page-footer span {
+      font-size:.6rem; letter-spacing:.15em;
+      color:rgba(255,255,255,.2);
+    }
+
+    @media (max-width:600px){
+      .content { padding:120px 20px max(60px, env(safe-area-inset-bottom, 60px)); }
+      .about-header h1 { font-size:1.4rem; letter-spacing:.25em; }
+      .about-body p { font-size:.95rem; }
+      .page-nav { padding:max(28px, env(safe-area-inset-top, 28px)) 20px 14px; }
+      .page-nav .nav-links { gap:14px; }
+      .page-nav .nav-links a { font-size:.55rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fixed background photo -->
+  <div class="bg-fixed"></div>
+
+  <!-- Icecap gradient glows -->
+  <div class="glow-top"></div>
+  <div class="glow-bottom"></div>
+
+  <!-- Navigation -->
+  <nav class="page-nav">
+    <a class="nav-brand" href="../index.html">Zoe Lane</a>
+    <div class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="portfolio/">Gallery</a>
+      <a class="active" href="about.html">About</a>
+      <a href="cv.html">CV</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="content">
+    <div class="about-header">
+      <h1>Artist Statement</h1>
+      <div class="divider"></div>
+    </div>
+
+    <div class="about-photo">
+      <img src="../Photos/Main%20Profile%20Photo/background.jpg" alt="Zoe Lane">
+    </div>
+
+    <div class="about-body">
+      <p>Zoe Lane is a studio artist whose work is rooted in emotion, vulnerability, and the unspoken experiences that shape human connection. She earned her Bachelor of Arts in Studio Art with a concentration in sculpture, along with minors in photography and business, from the University of Saint Francis. As a creative shaped by deep feeling and inner complexity, she was drawn to art through its ability to express what words often cannot.</p>
+
+      <p>At the center of Zoe Lane's practice is the desire to make people feel. Her work explores the emotional weight of mental health and the layered experience of being a woman in a world that so often asks women to be soft and strong, visible and silent, delicate and unbreakable all at once. She is drawn to the tension within those contradictions and uses art as a way to give them form.</p>
+
+      <p>Through found objects and fabric, she creates wearable sculptures that carry both intimacy and burden. These forms speak to femininity not as performance, but as lived experience. They embody tenderness, pain, endurance, beauty, and pressure. They hold the physical and emotional realities that women are often expected to carry quietly.</p>
+
+      <p>Her photography extends that language by capturing moments that feel deeply personal, fragile, and honest. Through a feminine lens, she documents emotional states that are often hidden beneath the surface, revealing the quiet struggle, sensitivity, and strength that can exist within a single moment. Rather than offering polished distance, her work invites closeness. It asks the viewer not only to look, but to feel.</p>
+
+      <p>Zoe Lane's goal is to create work that reaches people at an emotional level strong enough to leave something behind. She wants her viewers to feel understood in their pain, seen in their softness, challenged in their assumptions, and reminded of the strength that can exist within vulnerability. Her work is an invitation into honesty, into empathy, and into the kind of connection that can only happen when something true is finally given shape.</p>
+    </div>
+
+    <div class="about-signature">— Zoe Lane</div>
+  </div>
+
+  <footer class="page-footer">
+    <span>&copy; 2026 Zoe Lane Art</span>
+  </footer>
+
+
+</body>
+</html>

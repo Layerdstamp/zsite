@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#020000">
+  <title>See More of Me | Zoe Lane</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html, body {
+      font-family:'Cormorant Garamond', Georgia, serif;
+      background:#000; color:#fff;
+      height:100%; overflow:hidden;
+      -webkit-tap-highlight-color:transparent;
+      touch-action:none;
+      overscroll-behavior:none;
+    }
+
+    /* NAV */
+    .page-nav {
+      position:fixed; top:0; left:0; right:0; z-index:50;
+      padding:28px 28px 18px;
+      display:flex; align-items:center; justify-content:space-between;
+      background:linear-gradient(180deg, rgba(0,0,0,.7) 0%, transparent 100%);
+    }
+    .page-nav .nav-brand {
+      font-family:'Playfair Display', serif;
+      font-size:.97rem; letter-spacing:.3em; text-transform:uppercase;
+      color:rgba(255,255,255,.6); text-decoration:none; transition:color .3s;
+    }
+    .page-nav .nav-brand:hover { color:#fff; }
+    .page-nav .nav-links { display:flex; gap:24px; }
+    .page-nav .nav-links a {
+      font-size:.77rem; letter-spacing:.18em; text-transform:uppercase;
+      color:rgba(255,255,255,.4); text-decoration:none; transition:color .3s;
+    }
+    .page-nav .nav-links a:hover { color:rgba(255,255,255,.8); }
+
+    /* ALBUM SCREEN */
+    #albumScreen {
+      position:fixed; inset:0; z-index:10;
+      display:flex; align-items:center; justify-content:center;
+      background:#000;
+    }
+    .album-card {
+      position:absolute;
+      width:85vw; max-width:420px;
+      height:75vh; max-height:680px;
+      border-radius:14px; overflow:hidden;
+      box-shadow:0 20px 60px rgba(0,0,0,.8);
+      transition:transform .5s cubic-bezier(.23,1,.32,1), opacity .5s;
+      will-change:transform, opacity;
+      cursor:grab;
+    }
+    .album-card:active { cursor:grabbing; }
+    .album-card img {
+      width:100%; height:100%; object-fit:cover; pointer-events:none;
+      user-select:none; -webkit-user-drag:none;
+    }
+    .album-counter {
+      position:fixed; bottom:40px; left:50%; transform:translateX(-50%);
+      z-index:15; font-size:.7rem; letter-spacing:.2em;
+      color:rgba(255,255,255,.3);
+    }
+    .swipe-hint {
+      position:fixed; bottom:70px; left:50%; transform:translateX(-50%);
+      z-index:15; font-size:.65rem; letter-spacing:.15em;
+      color:rgba(255,255,255,.15);
+      animation:fadeHint 3s ease-in-out infinite;
+    }
+    @keyframes fadeHint {
+      0%,100%{ opacity:0; } 50%{ opacity:1; }
+    }
+
+    /* PASSWORD SCREEN */
+    #passwordScreen {
+      position:fixed; inset:0; z-index:10;
+      display:none; align-items:center; justify-content:center;
+      flex-direction:column;
+      background:#000;
+    }
+    .pw-title {
+      font-family:'Playfair Display', serif;
+      font-size:1.1rem; letter-spacing:.3em; text-transform:uppercase;
+      color:rgba(255,255,255,.5);
+      margin-bottom:30px;
+    }
+    .pw-input {
+      background:transparent; border:none;
+      border-bottom:1px solid rgba(255,255,255,.15);
+      color:#fff; font-family:'Cormorant Garamond', serif;
+      font-size:1.6rem; letter-spacing:.4em;
+      text-align:center; width:160px; padding:8px 0;
+      outline:none;
+      caret-color:rgba(180,220,240,.4);
+    }
+    .pw-input::placeholder {
+      color:rgba(255,255,255,.12);
+      font-size:1rem; letter-spacing:.2em;
+    }
+    .pw-error {
+      margin-top:16px; font-size:.72rem;
+      letter-spacing:.12em; color:rgba(200,100,100,.5);
+      min-height:1.2em;
+    }
+
+    /* REVEAL SCREEN */
+    #revealScreen {
+      position:fixed; inset:0; z-index:10;
+      display:none; align-items:center; justify-content:center;
+      background:#000;
+    }
+    .reveal-container {
+      position:relative;
+      width:85vw; max-width:420px;
+      height:75vh; max-height:680px;
+      border-radius:14px; overflow:hidden;
+      box-shadow:0 20px 60px rgba(0,0,0,.8);
+    }
+    .reveal-container img {
+      position:absolute; inset:0;
+      width:100%; height:100%; object-fit:cover;
+      pointer-events:none; user-select:none;
+    }
+    .reveal-canvas {
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      cursor:crosshair;
+      touch-action:none;
+    }
+    .reveal-hint {
+      position:fixed; bottom:70px; left:50%; transform:translateX(-50%);
+      z-index:15; font-size:.65rem; letter-spacing:.15em;
+      color:rgba(255,255,255,.15);
+      animation:fadeHint 3s ease-in-out infinite;
+    }
+    .reveal-counter {
+      position:fixed; bottom:40px; left:50%; transform:translateX(-50%);
+      z-index:15; font-size:.7rem; letter-spacing:.2em;
+      color:rgba(255,255,255,.3);
+    }
+    .reveal-nav {
+      position:fixed; bottom:100px; left:50%; transform:translateX(-50%);
+      z-index:15; display:flex; gap:30px;
+    }
+    .reveal-nav button {
+      background:none; border:1px solid rgba(255,255,255,.12);
+      border-radius:50%; width:44px; height:44px;
+      color:rgba(255,255,255,.4); font-size:1.1rem;
+      cursor:pointer; transition:border-color .3s, color .3s;
+    }
+    .reveal-nav button:hover {
+      border-color:rgba(180,220,240,.3); color:rgba(255,255,255,.7);
+    }
+
+    @media (max-width:600px){
+      .page-nav { padding:max(28px, env(safe-area-inset-top, 28px)) 20px 14px; }
+      .page-nav .nav-links { gap:14px; }
+      .page-nav .nav-links a { font-size:.55rem; }
+      .album-card { width:90vw; height:70vh; border-radius:10px; }
+      .reveal-container { width:90vw; height:70vh; border-radius:10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="page-nav">
+    <a class="nav-brand" href="../../index.html">Zoe Lane</a>
+    <div class="nav-links">
+      <a href="../../index.html">Home</a>
+      <a href="../../art/">Art</a>
+      <a href="../">My Life</a>
+    </div>
+  </nav>
+
+  <!-- PHASE 1: Swipeable photo album -->
+  <div id="albumScreen">
+    <span class="swipe-hint">swipe to explore</span>
+    <span class="album-counter" id="albumCounter"></span>
+  </div>
+
+  <!-- PHASE 2: Password gate -->
+  <div id="passwordScreen">
+    <div class="pw-title">Private</div>
+    <input class="pw-input" id="pwInput" type="password" maxlength="6" placeholder="&bull;&bull;&bull;" autocomplete="off">
+    <div class="pw-error" id="pwError"></div>
+  </div>
+
+  <!-- PHASE 3: Blur-reveal gallery -->
+  <div id="revealScreen">
+    <div class="reveal-container" id="revealContainer">
+      <img id="revealImg" src="" alt="">
+      <canvas class="reveal-canvas" id="revealCanvas"></canvas>
+    </div>
+    <span class="reveal-hint">swipe to reveal</span>
+    <div class="reveal-nav">
+      <button id="revealPrev">&#8249;</button>
+      <button id="revealNext">&#8250;</button>
+    </div>
+    <span class="reveal-counter" id="revealCounter"></span>
+  </div>
+
+  <script>
+    /* ── PHOTO DATA ─────────────────────────── */
+    const scrollPhotos = [
+      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Photo%20Feb%2022%202026%2C%201%2031%2016%20AM.jpg',
+      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Photo%20Mar%2025%202026%2C%209%2055%2031%20PM%20(1).jpg',
+      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Photo%20Mar%2025%202026%2C%209%2055%2034%20PM.jpg',
+      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Photo%20Oct%2019%202025%2C%201%2006%2031%20AM.jpg'
+    ];
+
+    const privatePhotos = [
+      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Images%20behind%20pasword%20444/Photo%20Feb%2014%202026%2C%2010%2018%2000%20PM.jpg',
+      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Images%20behind%20pasword%20444/Photo%20Feb%2019%202026%2C%206%2058%2059%20PM.jpg',
+      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Images%20behind%20pasword%20444/Photo%20Nov%2019%202025%2C%209%2022%2024%20PM.jpg',
+      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Images%20behind%20pasword%20444/Photo%20Nov%2024%202025%2C%2010%2040%2007%20PM.jpg',
+      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Images%20behind%20pasword%20444/Photo%20Nov%2024%202025%2C%2011%2037%2003%20PM.jpg',
+      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Images%20behind%20pasword%20444/Photo%20Nov%2024%202025%2C%2011%2057%2059%20PM.jpg'
+    ];
+
+    /* ── PHASE 1: SWIPEABLE ALBUM ───────────── */
+    const albumScreen = document.getElementById('albumScreen');
+    const albumCounter = document.getElementById('albumCounter');
+    let albumIdx = 0;
+    let cards = [];
+    let isDragging = false, startX = 0, startY = 0, dx = 0, dy = 0;
+    let throwing = false;
+    let boundMove = null, boundEnd = null;
+
+    function buildAlbum() {
+      scrollPhotos.forEach((src, i) => {
+        const card = document.createElement('div');
+        card.className = 'album-card';
+        card.style.zIndex = scrollPhotos.length - i;
+        // All cards stacked at full scale, only front visible
+        if (i > 0) card.style.opacity = '0';
+        card.innerHTML = '<img src="' + src + '" alt="Photo ' + (i+1) + '">';
+        albumScreen.insertBefore(card, albumCounter);
+        cards.push(card);
+      });
+      updateAlbumCounter();
+      attachSwipe();
+    }
+
+    function updateAlbumCounter() {
+      albumCounter.textContent = albumIdx < scrollPhotos.length
+        ? (albumIdx + 1) + ' / ' + scrollPhotos.length : '';
+    }
+
+    function cleanupSwipe() {
+      if (boundMove) { window.removeEventListener('mousemove', boundMove); window.removeEventListener('touchmove', boundMove); }
+      if (boundEnd) { window.removeEventListener('mouseup', boundEnd); window.removeEventListener('touchend', boundEnd); }
+      boundMove = null; boundEnd = null;
+    }
+
+    function attachSwipe() {
+      if (albumIdx >= cards.length || throwing) return;
+      cleanupSwipe();
+      const card = cards[albumIdx];
+
+      const onStart = (e) => {
+        if (throwing) return;
+        isDragging = true;
+        const pt = e.touches ? e.touches[0] : e;
+        startX = pt.clientX; startY = pt.clientY;
+        dx = 0; dy = 0;
+        card.style.transition = 'none';
+      };
+
+      boundMove = (e) => {
+        if (!isDragging) return;
+        const pt = e.touches ? e.touches[0] : e;
+        dx = pt.clientX - startX;
+        dy = pt.clientY - startY;
+        const rot = dx * .08;
+        card.style.transform = 'translate(' + dx + 'px,' + dy + 'px) rotate(' + rot + 'deg)';
+      };
+
+      boundEnd = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        // Very low threshold — slightest real swipe throws it
+        if (dist > 20) {
+          throwCard(card, dx, dy);
+        } else {
+          card.style.transition = 'transform .3s cubic-bezier(.23,1,.32,1)';
+          card.style.transform = '';
+        }
+      };
+
+      card.addEventListener('mousedown', onStart);
+      card.addEventListener('touchstart', onStart, {passive:true});
+      window.addEventListener('mousemove', boundMove);
+      window.addEventListener('touchmove', boundMove, {passive:true});
+      window.addEventListener('mouseup', boundEnd);
+      window.addEventListener('touchend', boundEnd);
+    }
+
+    function throwCard(card, dx, dy) {
+      throwing = true;
+      const angle = Math.atan2(dy, dx);
+      const throwX = Math.cos(angle) * window.innerWidth * 1.8;
+      const throwY = Math.sin(angle) * window.innerHeight * 1.8;
+      const rot = dx * .2;
+      card.style.transition = 'transform .45s cubic-bezier(.23,1,.32,1), opacity .45s';
+      card.style.transform = 'translate(' + throwX + 'px,' + throwY + 'px) rotate(' + rot + 'deg)';
+      card.style.opacity = '0';
+      card.style.pointerEvents = 'none';
+
+      // Wait for throw animation to fully finish before revealing next card
+      card.addEventListener('transitionend', function handler(e) {
+        if (e.propertyName !== 'transform') return;
+        card.removeEventListener('transitionend', handler);
+
+        albumIdx++;
+        updateAlbumCounter();
+        cleanupSwipe();
+        throwing = false;
+
+        if (albumIdx < cards.length) {
+          // Reveal next card (it was hidden behind)
+          cards[albumIdx].style.transition = 'opacity .3s';
+          cards[albumIdx].style.opacity = '1';
+          attachSwipe();
+        } else {
+          setTimeout(showPassword, 600);
+        }
+      });
+    }
+
+    /* ── PHASE 2: PASSWORD ──────────────────── */
+    const passwordScreen = document.getElementById('passwordScreen');
+    const pwInput = document.getElementById('pwInput');
+    const pwError = document.getElementById('pwError');
+
+    function showPassword() {
+      albumScreen.style.display = 'none';
+      passwordScreen.style.display = 'flex';
+      pwInput.focus();
+    }
+
+    pwInput.addEventListener('input', () => {
+      pwError.textContent = '';
+      if (pwInput.value === '444') {
+        passwordScreen.style.opacity = '0';
+        passwordScreen.style.transition = 'opacity .6s';
+        setTimeout(showReveal, 600);
+      }
+    });
+    pwInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && pwInput.value !== '444') {
+        pwError.textContent = 'incorrect';
+        pwInput.value = '';
+      }
+    });
+
+    /* ── PHASE 3: BLUR-REVEAL ───────────────── */
+    const revealScreen = document.getElementById('revealScreen');
+    const revealImg = document.getElementById('revealImg');
+    const revealCanvas = document.getElementById('revealCanvas');
+    const revealCounter = document.getElementById('revealCounter');
+    const ctx = revealCanvas.getContext('2d');
+    let revealIdx = 0;
+
+    function showReveal() {
+      passwordScreen.style.display = 'none';
+      revealScreen.style.display = 'flex';
+      loadRevealPhoto(0);
+    }
+
+    function loadRevealPhoto(idx) {
+      revealIdx = idx;
+      revealImg.src = privatePhotos[idx];
+      revealCounter.textContent = (idx + 1) + ' / ' + privatePhotos.length;
+
+      // Wait for image to load then setup canvas frost
+      revealImg.onload = () => {
+        const container = document.getElementById('revealContainer');
+        const w = container.offsetWidth;
+        const h = container.offsetHeight;
+        revealCanvas.width = w;
+        revealCanvas.height = h;
+
+        // Draw blurred copy on canvas
+        ctx.filter = 'blur(28px)';
+        ctx.drawImage(revealImg, 0, 0, w, h);
+        ctx.filter = 'none';
+
+        // Add frosted tint overlay
+        ctx.fillStyle = 'rgba(0,0,0,.25)';
+        ctx.fillRect(0, 0, w, h);
+      };
+    }
+
+    // Touch/mouse reveal — erase canvas to show sharp image underneath
+    let isRevealing = false;
+    function revealAt(x, y) {
+      const rect = revealCanvas.getBoundingClientRect();
+      const cx = (x - rect.left) * (revealCanvas.width / rect.width);
+      const cy = (y - rect.top) * (revealCanvas.height / rect.height);
+      ctx.globalCompositeOperation = 'destination-out';
+      // Soft circular brush
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 50);
+      grad.addColorStop(0, 'rgba(0,0,0,1)');
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 50, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    revealCanvas.addEventListener('mousedown', (e) => { isRevealing = true; revealAt(e.clientX, e.clientY); });
+    revealCanvas.addEventListener('mousemove', (e) => { if (isRevealing) revealAt(e.clientX, e.clientY); });
+    window.addEventListener('mouseup', () => { isRevealing = false; });
+    revealCanvas.addEventListener('touchstart', (e) => { isRevealing = true; revealAt(e.touches[0].clientX, e.touches[0].clientY); }, {passive:true});
+    revealCanvas.addEventListener('touchmove', (e) => { if (isRevealing) revealAt(e.touches[0].clientX, e.touches[0].clientY); }, {passive:true});
+    window.addEventListener('touchend', () => { isRevealing = false; });
+
+    // Nav buttons
+    document.getElementById('revealPrev').addEventListener('click', () => {
+      if (revealIdx > 0) loadRevealPhoto(revealIdx - 1);
+    });
+    document.getElementById('revealNext').addEventListener('click', () => {
+      if (revealIdx < privatePhotos.length - 1) loadRevealPhoto(revealIdx + 1);
+    });
+
+    /* ── INIT ───────────────────────────────── */
+    buildAlbum();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#020000">
+  <title>&#10086;&#3834;&#119985;&#119994;&#119890; &#119897;&#119834;&#119899;&#119890;&#3835;&#10086;</title>
+  <meta name="description" content="Zoe Lane - links, socials, art &amp; design.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+      background: #020000;
+      color: #c8b59b;
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior: none;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ---- FIXED BACKGROUND IMAGE ---- */
+    .bg-fixed {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+    .bg-fixed img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: 48% 25%;
+      filter: brightness(.55) saturate(.85);
+    }
+
+    /* ---- HERO ZONE (transparent window into bg) ---- */
+    .hero-zone {
+      position: relative;
+      z-index: 1;
+      height: 85vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 48px;
+    }
+    .hero-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.8rem;
+      font-weight: 400;
+      letter-spacing: .4em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.85);
+      text-shadow: 0 2px 20px rgba(0,0,0,.6);
+    }
+    .hero-sub {
+      margin-top: 8px;
+      font-size: .75rem;
+      letter-spacing: .22em;
+      text-transform: lowercase;
+      color: rgba(255,255,255,.45);
+      text-shadow: 0 1px 10px rgba(0,0,0,.5);
+    }
+    .hero-scroll {
+      margin-top: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: .4;
+      transition: opacity .3s;
+    }
+    .hero-scroll span {
+      font-size: .6rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    .hero-scroll svg {
+      width: 16px; height: 16px;
+      stroke: #fff; stroke-width: 2;
+      fill: none; stroke-linecap: round; stroke-linejoin: round;
+      animation: scrollBounce 2s ease-in-out infinite;
+    }
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateY(0); opacity: .4; }
+      50% { transform: translateY(5px); opacity: .8; }
+    }
+
+    /* ---- CONTENT PANEL (scrolls over bg) ---- */
+    .content-panel {
+      position: relative;
+      z-index: 2;
+      background: linear-gradient(180deg,
+        transparent 0%,
+        rgba(2,0,0,.08) 40px,
+        rgba(2,0,0,.2)  100px,
+        rgba(2,0,0,.4)  180px,
+        rgba(2,0,0,.62) 260px,
+        rgba(2,0,0,.8)  340px,
+        rgba(2,0,0,.92) 420px,
+        #020000 520px);
+      padding-top: 80px;
+    }
+    /* Soft warm glow divider at transition */
+    .content-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 160px;
+      background: radial-gradient(ellipse 60% 100% at 50% 0%,
+        rgba(200,181,155,.06) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    /* Thin luminous accent line */
+    .content-panel::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140px;
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(200,181,155,.25) 30%,
+        rgba(200,181,155,.35) 50%,
+        rgba(200,181,155,.25) 70%,
+        transparent 100%);
+      pointer-events: none;
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 20px max(120px, env(safe-area-inset-bottom, 120px));
+    }
+
+    .username {
+      font-size: .85rem;
+      letter-spacing: .24em;
+      text-transform: lowercase;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 60px;
+    }
+
+    /* ---- SOCIAL ROW (Instagram & TikTok side by side) ---- */
+    .social-row {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      width: 100%;
+      margin-bottom: 60px;
+    }
+    .social-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      max-width: 200px;
+      transition: transform .2s ease;
+    }
+    .social-card:active { transform: scale(.96); }
+    @media (hover: hover) {
+      .social-card:hover { transform: scale(1.03); }
+    }
+    .social-card img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 14px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.7);
+    }
+    .social-icon {
+      width: 22px; height: 22px;
+      fill: rgba(200,181,155,.65);
+      transition: fill .2s;
+    }
+    @media (hover: hover) {
+      .social-card:hover .social-icon { fill: rgba(200,181,155,1); }
+    }
+
+    /* ---- LINK CARDS ---- */
+    .link-cards {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .link-card {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 22px 4px;
+      border-top: 1px solid rgba(200,181,155,.12);
+      transition: all .3s ease;
+      cursor: pointer;
+    }
+    .link-card:last-child {
+      border-bottom: 1px solid rgba(200,181,155,.12);
+    }
+    .link-card__text {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: .75rem;
+      font-style: italic;
+      letter-spacing: .22em;
+      text-transform: lowercase;
+      color: rgba(255,255,255,.75);
+      transition: color .3s ease, letter-spacing .3s ease;
+    }
+    .link-card__arrow {
+      width: 18px; height: 18px;
+      fill: none;
+      stroke: rgba(200,181,155,.25);
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform .3s ease, stroke .3s ease;
+      flex-shrink: 0;
+    }
+    @media (hover: hover) {
+      .link-card:hover {
+        border-color: rgba(200,181,155,.3);
+      }
+      .link-card:hover .link-card__text {
+        color: rgba(255,255,255,1);
+        letter-spacing: .28em;
+      }
+      .link-card:hover .link-card__arrow {
+        stroke: rgba(200,181,155,.8);
+        transform: translateX(4px);
+      }
+    }
+    .link-card:active {
+      opacity: .7;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Fixed background photo -->
+  <div class="bg-fixed">
+    <img src="Photos/Main%20Profile%20Photo/background.jpg" alt="">
+  </div>
+
+  <!-- Hero zone: transparent window into background image -->
+  <div class="hero-zone">
+    <h1 class="hero-name">Zoe Lane</h1>
+    <p class="hero-sub">@solelyzoelane</p>
+    <div class="hero-scroll">
+      <span>scroll</span>
+      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    </div>
+  </div>
+
+  <!-- Content panel: scrolls up over the background -->
+  <div class="content-panel">
+    <div class="content">
+
+      <!-- Instagram & TikTok side by side -->
+      <div class="social-row">
+      <a class="social-card" href="https://www.instagram.com/solelyzoelane" target="_blank" rel="noreferrer noopener">
+        <img src="Photos/Instagram/instagram.jpg" alt="Instagram">
+        <svg class="social-icon" viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm5.25-2.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z"/></svg>
+      </a>
+      <a class="social-card" href="https://www.tiktok.com/@solelyzoelane" target="_blank" rel="noreferrer noopener">
+        <img src="Photos/Tiktok/tiktok.jpg" alt="TikTok">
+        <svg class="social-icon" viewBox="0 0 24 24"><path d="M16.6 5.82A4.278 4.278 0 0 1 13.81 3h-3.09v12.4a2.592 2.592 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.59a2.59 2.59 0 0 1 2.6-2.59c.27 0 .53.04.77.12V9.7a6.126 6.126 0 0 0-.77-.05 5.96 5.96 0 0 0-5.96 5.96 5.96 5.96 0 0 0 5.96 5.96 5.96 5.96 0 0 0 5.96-5.96V9.01a7.61 7.61 0 0 0 4.51 1.47V7.4a4.28 4.28 0 0 1-1.94-.58Z"/></svg>
+      </a>
+    </div>
+
+    <!-- Link buttons -->
+    <div class="link-cards">
+      <a class="link-card" href="a-look-into-my-life/">
+        <span class="link-card__text">a look into my life</span>
+        <svg class="link-card__arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a class="link-card" href="art/">
+        <span class="link-card__text">art &amp; design</span>
+        <svg class="link-card__arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+  </div>
+
+  <script>
+    /* Fade hero zone text as user scrolls — clean parallax feel */
+    (function() {
+      var heroZone = document.querySelector('.hero-zone');
+      var scrollHint = document.querySelector('.hero-scroll');
+      var ticking = false;
+
+      window.addEventListener('scroll', function() {
+        if (!ticking) {
+          requestAnimationFrame(function() {
+            var t = Math.min(window.scrollY / (window.innerHeight * 0.45), 1);
+            heroZone.style.opacity = 1 - t;
+            if (t > 0.05 && scrollHint) {
+              scrollHint.style.opacity = '0';
+            }
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }, { passive: true });
+    })();
+  </script>
+
+</body>
+</html>

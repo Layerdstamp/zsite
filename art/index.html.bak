@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zoe Lane Art</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="art-styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="logo-area" href="index.html">
+        <img class="logo-pic" src="../assets/images/art/profile-pic.jpeg" alt="Zoe Lane">
+        <span class="logo-text">Zoe Lane Art</span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <a class="is-active" href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="cv.html">CV</a>
+        <a href="contact.html">Contact</a>
+        <a href="portfolio/">Portfolio</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="hero">
+      <img
+        class="hero__image"
+        src="../assets/images/art/hero.jpeg"
+        alt="Zoe Lane Art"
+      >
+      <p class="hero__quote">"The world would be nothing without artistic expression"</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <span class="footer-name">Zoe Lane</span>
+      <span>&copy;2026 by zoelaneart.</span>
+    </div>
+  </footer>
+</body>
+</html>
