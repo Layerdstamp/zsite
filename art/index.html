@@ -13,6 +13,32 @@
     html, body { width:100%; height:100%; overflow:hidden; background:#000; }
     body { font-family:'Playfair Display', Georgia, serif; color:#fff; touch-action:none; -webkit-tap-highlight-color:transparent; overscroll-behavior:none; }
 
+    html.flat-mode, body.flat-mode {
+      height:auto;
+      min-height:100%;
+      overflow-x:hidden;
+      overflow-y:auto;
+    }
+    body.flat-mode {
+      background:#0a0a0a;
+      touch-action:manipulation;
+      overscroll-behavior:auto;
+    }
+    body.flat-mode #galaxy-canvas,
+    body.flat-mode #gallery-canvas,
+    body.flat-mode #intro-overlay,
+    body.flat-mode #skip-btn,
+    body.flat-mode #character,
+    body.flat-mode #walk-hint,
+    body.flat-mode #scroll-prompt,
+    body.flat-mode #photo-overlay,
+    body.flat-mode #zoom-flash {
+      display:none !important;
+    }
+    body.flat-mode .nav-menu {
+      height:100dvh;
+    }
+
     /* ── GALAXY INTRO ──────────────────────────── */
     #galaxy-canvas { position:fixed; inset:0; z-index:10; }
     #intro-overlay {
@@ -400,10 +426,74 @@
   var $flatGallery = document.getElementById('flat-gallery');
   var $fgGrid = document.getElementById('fg-grid');
 
+  var flatBuilt = false;
+  function buildFlatGallery(){
+    if(flatBuilt) return;
+    for(var ci = 0; ci < artworks.length; ci++){
+      var card = document.createElement('div');
+      card.className = 'fg-card';
+      card.innerHTML = '<img src="' + artworks[ci].s + '" alt="' + artworks[ci].t + '" loading="lazy">' +
+        '<div class="fg-card-info"><h3>' + artworks[ci].t + '</h3><span>' + artworks[ci].y + '</span></div>';
+      $fgGrid.appendChild(card);
+    }
+    flatBuilt = true;
+  }
+
+  function attachMenuToggle(){
+    if($ham.dataset.bound === 'true') return;
+    $ham.dataset.bound = 'true';
+    $ham.addEventListener('click', function(){
+      $ham.classList.toggle('open');
+      $nav.classList.toggle('open');
+    });
+  }
+
+  function supportsWebGL(){
+    try {
+      var canvas = document.createElement('canvas');
+      return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+    } catch(err){
+      return false;
+    }
+  }
+
+  function shouldUseFlatMode(){
+    var coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    var noHover = window.matchMedia && window.matchMedia('(hover: none)').matches;
+    var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var lowMemory = navigator.deviceMemory && navigator.deviceMemory <= 4;
+    var lowCpu = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
+    return reducedMotion || !supportsWebGL() || (coarse && noHover && (lowMemory || lowCpu || innerWidth <= 900));
+  }
+
+  function activateFlatMode(){
+    phase = 'flat';
+    attachMenuToggle();
+    buildFlatGallery();
+    document.documentElement.classList.add('flat-mode');
+    document.body.classList.add('flat-mode');
+    $flatGallery.classList.add('visible');
+    $nav.classList.remove('open');
+    $ham.classList.remove('open');
+  }
+
+  attachMenuToggle();
+
+  if(typeof THREE === 'undefined' || shouldUseFlatMode()){
+    activateFlatMode();
+    return;
+  }
+
   /* ═══════════════════════════════════════════════
      GALAXY SCENE
      ═══════════════════════════════════════════════ */
-  var gR = new THREE.WebGLRenderer({canvas:$gc, antialias:false, alpha:false});
+  var gR;
+  try {
+    gR = new THREE.WebGLRenderer({canvas:$gc, antialias:false, alpha:false});
+  } catch(err){
+    activateFlatMode();
+    return;
+  }
   gR.setSize(innerWidth, innerHeight);
   gR.setPixelRatio(Math.min(devicePixelRatio, 2));
 
@@ -483,7 +573,14 @@
   /* ═══════════════════════════════════════════════
      GALLERY SCENE
      ═══════════════════════════════════════════════ */
-  var rend = new THREE.WebGLRenderer({canvas:$gal, antialias:true});
+  var rend;
+  try {
+    rend = new THREE.WebGLRenderer({canvas:$gal, antialias:true});
+  } catch(err){
+    try { gR.dispose(); } catch(ignore) {}
+    activateFlatMode();
+    return;
+  }
   rend.setSize(innerWidth, innerHeight);
   rend.setPixelRatio(Math.min(devicePixelRatio, 2));
   rend.shadowMap.enabled = true;
@@ -742,13 +839,7 @@
   /* ═══════════════════════════════════════════════
      BUILD 2D FLAT GALLERY CARDS
      ═══════════════════════════════════════════════ */
-  for(var ci = 0; ci < artworks.length; ci++){
-    var card = document.createElement('div');
-    card.className = 'fg-card';
-    card.innerHTML = '<img src="' + artworks[ci].s + '" alt="' + artworks[ci].t + '" loading="lazy">' +
-      '<div class="fg-card-info"><h3>' + artworks[ci].t + '</h3><span>' + artworks[ci].y + '</span></div>';
-    $fgGrid.appendChild(card);
-  }
+  buildFlatGallery();
 
   /* ═══════════════════════════════════════════════
      TRANSITION TO FLAT GALLERY
@@ -920,10 +1011,7 @@
   /* ═══════════════════════════════════════════════
      MENU TOGGLE
      ═══════════════════════════════════════════════ */
-  $ham.addEventListener('click', function(){
-    $ham.classList.toggle('open');
-    $nav.classList.toggle('open');
-  });
+  attachMenuToggle();
 
   /* ═══════════════════════════════════════════════
      RESIZE
