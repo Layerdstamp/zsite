@@ -157,11 +157,18 @@
       display:grid; grid-template-columns:1fr 1fr;
       gap:12px; max-width:500px; width:90%;
     }
+    .story-collage.cols-3 {
+      grid-template-columns:1fr 1fr 1fr;
+    }
     .story-collage .collage-slot {
       aspect-ratio:1; border-radius:6px; overflow:hidden;
       background:rgba(255,255,255,.03);
       border:1px solid rgba(255,255,255,.06);
       display:flex; align-items:center; justify-content:center;
+    }
+    .story-collage .collage-slot.wide {
+      grid-column: span 2;
+      aspect-ratio: 2/1;
     }
     .story-collage .collage-slot img {
       width:100%; height:100%; object-fit:cover;
@@ -232,64 +239,98 @@
   </footer>
 
   <script>
-    // Travel destinations — add photo paths when ready
-    const destinations = [
-      { name:'Florida', photos:[] },
-      { name:'Boston', photos:[] },
-      { name:'Washington D.C.', photos:[] },
-      { name:'Virginia Beach', photos:[] },
-      { name:'New York City', photos:[] },
-      { name:'Pennsylvania', photos:[] },
-      { name:'Atlanta', photos:[] },
-      { name:'Chicago', photos:[] },
-      { name:'Los Angeles', photos:[] }
+    var imgBase = '../../assets/images/bio/travel/';
+
+    var destinations = [
+      { name:'Boston', slug:'boston', count:4 },
+      { name:'Chicago', slug:'chicago', count:6 },
+      { name:'Delaware', slug:'delaware', count:4 },
+      { name:'Gatlinburg', slug:'gatlinburg', count:3 },
+      { name:'Ireland', slug:'ireland', count:6 },
+      { name:'Kentucky', slug:'kentucky', count:5 },
+      { name:'Los Angeles', slug:'la', count:6 },
+      { name:'Miami', slug:'miami', count:3 },
+      { name:'Myrtle Beach', slug:'myrtle-beach', count:4 },
+      { name:'New York', slug:'new-york', count:4 },
+      { name:'Virginia Beach', slug:'virginia-beach', count:5 },
+      { name:'Washington D.C.', slug:'washington-dc', count:4 }
     ];
 
-    const storyRow = document.getElementById('storyRow');
-    const overlay = document.getElementById('storyOverlay');
-    const storyTitle = document.getElementById('storyTitle');
-    const storyCollage = document.getElementById('storyCollage');
-    const closeBtn = document.getElementById('closeStory');
+    // Build photo arrays from numbered files
+    destinations.forEach(function(d) {
+      d.cover = imgBase + d.slug + '/cover.jpg';
+      d.photos = [];
+      for (var i = 1; i <= d.count; i++) {
+        d.photos.push(imgBase + d.slug + '/' + i + '.jpg');
+      }
+    });
 
-    // Build bubbles
-    destinations.forEach((dest, i) => {
-      const bubble = document.createElement('div');
+    var storyRow = document.getElementById('storyRow');
+    var overlay = document.getElementById('storyOverlay');
+    var storyTitle = document.getElementById('storyTitle');
+    var storyCollage = document.getElementById('storyCollage');
+    var closeBtn = document.getElementById('closeStory');
+
+    // Build bubbles with cover photos
+    destinations.forEach(function(dest) {
+      var bubble = document.createElement('div');
       bubble.className = 'story-bubble';
-      bubble.innerHTML = `
-        <div class="story-ring">
-          <div class="story-circle">
-            ${dest.photos.length > 0
-              ? '<img src="' + dest.photos[0] + '" alt="' + dest.name + '">'
-              : '<span class="placeholder-icon">&#9679;</span>'}
-          </div>
-        </div>
-        <span class="story-label">${dest.name}</span>
-      `;
-      bubble.addEventListener('click', () => openStory(dest));
+      bubble.innerHTML =
+        '<div class="story-ring">' +
+          '<div class="story-circle">' +
+            '<img src="' + dest.cover + '" alt="' + dest.name + '">' +
+          '</div>' +
+        '</div>' +
+        '<span class="story-label">' + dest.name + '</span>';
+      bubble.addEventListener('click', function() { openStory(dest); });
       storyRow.appendChild(bubble);
     });
 
     function openStory(dest) {
       storyTitle.textContent = dest.name;
       storyCollage.innerHTML = '';
-      const slots = Math.max(4, dest.photos.length);
-      for (let i = 0; i < slots; i++) {
-        const slot = document.createElement('div');
-        slot.className = 'collage-slot';
-        if (dest.photos[i]) {
-          slot.innerHTML = '<img src="' + dest.photos[i] + '" alt="' + dest.name + '">';
-        } else {
-          slot.innerHTML = '<span class="collage-placeholder">photo</span>';
+      storyCollage.className = 'story-collage';
+
+      var photos = dest.photos;
+      var n = photos.length;
+
+      // 3 photos: use 3-column layout
+      if (n === 3) {
+        storyCollage.classList.add('cols-3');
+      }
+
+      // 5 photos: first one spans full width, rest in 2x2
+      if (n === 5) {
+        var wide = document.createElement('div');
+        wide.className = 'collage-slot wide';
+        wide.innerHTML = '<img src="' + photos[0] + '" alt="' + dest.name + '">';
+        storyCollage.appendChild(wide);
+        for (var i = 1; i < n; i++) {
+          var slot = document.createElement('div');
+          slot.className = 'collage-slot';
+          slot.innerHTML = '<img src="' + photos[i] + '" alt="' + dest.name + '">';
+          storyCollage.appendChild(slot);
         }
-        storyCollage.appendChild(slot);
+        overlay.classList.add('active');
+        return;
+      }
+
+      // 6 photos: 3 rows of 2
+      // 4 photos: 2 rows of 2
+      // 3 photos: 1 row of 3
+      for (var j = 0; j < n; j++) {
+        var s = document.createElement('div');
+        s.className = 'collage-slot';
+        s.innerHTML = '<img src="' + photos[j] + '" alt="' + dest.name + '">';
+        storyCollage.appendChild(s);
       }
       overlay.classList.add('active');
     }
 
-    closeBtn.addEventListener('click', () => {
+    closeBtn.addEventListener('click', function() {
       overlay.classList.remove('active');
     });
-    overlay.addEventListener('click', (e) => {
+    overlay.addEventListener('click', function(e) {
       if (e.target === overlay) overlay.classList.remove('active');
     });
   </script>
