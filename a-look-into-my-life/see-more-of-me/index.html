@@ -75,93 +75,33 @@
       0%,100%{ opacity:0; } 50%{ opacity:1; }
     }
 
-    /* PASSWORD SCREEN */
-    #passwordScreen {
+    /* END SCREEN */
+    #endScreen {
       position:fixed; inset:0; z-index:10;
       display:none; align-items:center; justify-content:center;
-      flex-direction:column;
+      flex-direction:column; gap:20px;
       background:#000;
     }
-    .pw-title {
+    .end-title {
       font-family:'Playfair Display', serif;
       font-size:1.1rem; letter-spacing:.3em; text-transform:uppercase;
       color:rgba(255,255,255,.5);
-      margin-bottom:30px;
     }
-    .pw-input {
-      background:transparent; border:none;
-      border-bottom:1px solid rgba(255,255,255,.15);
-      color:#fff; font-family:'Cormorant Garamond', serif;
-      font-size:1.6rem; letter-spacing:.4em;
-      text-align:center; width:160px; padding:8px 0;
-      outline:none;
-      caret-color:rgba(180,220,240,.4);
+    .end-back {
+      font-size:.72rem; letter-spacing:.15em;
+      color:rgba(255,255,255,.25);
+      text-decoration:none;
+      border-bottom:1px solid rgba(255,255,255,.1);
+      padding-bottom:2px;
+      transition:color .3s, border-color .3s;
     }
-    .pw-input::placeholder {
-      color:rgba(255,255,255,.12);
-      font-size:1rem; letter-spacing:.2em;
-    }
-    .pw-error {
-      margin-top:16px; font-size:.72rem;
-      letter-spacing:.12em; color:rgba(200,100,100,.5);
-      min-height:1.2em;
-    }
-
-    /* REVEAL SCREEN */
-    #revealScreen {
-      position:fixed; inset:0; z-index:10;
-      display:none; align-items:center; justify-content:center;
-      background:#000;
-    }
-    .reveal-container {
-      position:relative;
-      width:85vw; max-width:420px;
-      height:75vh; max-height:680px;
-      border-radius:14px; overflow:hidden;
-      box-shadow:0 20px 60px rgba(0,0,0,.8);
-    }
-    .reveal-container img {
-      position:absolute; inset:0;
-      width:100%; height:100%; object-fit:cover;
-      pointer-events:none; user-select:none;
-    }
-    .reveal-canvas {
-      position:absolute; inset:0;
-      width:100%; height:100%;
-      cursor:crosshair;
-      touch-action:none;
-    }
-    .reveal-hint {
-      position:fixed; bottom:70px; left:50%; transform:translateX(-50%);
-      z-index:15; font-size:.65rem; letter-spacing:.15em;
-      color:rgba(255,255,255,.15);
-      animation:fadeHint 3s ease-in-out infinite;
-    }
-    .reveal-counter {
-      position:fixed; bottom:40px; left:50%; transform:translateX(-50%);
-      z-index:15; font-size:.7rem; letter-spacing:.2em;
-      color:rgba(255,255,255,.3);
-    }
-    .reveal-nav {
-      position:fixed; bottom:100px; left:50%; transform:translateX(-50%);
-      z-index:15; display:flex; gap:30px;
-    }
-    .reveal-nav button {
-      background:none; border:1px solid rgba(255,255,255,.12);
-      border-radius:50%; width:44px; height:44px;
-      color:rgba(255,255,255,.4); font-size:1.1rem;
-      cursor:pointer; transition:border-color .3s, color .3s;
-    }
-    .reveal-nav button:hover {
-      border-color:rgba(180,220,240,.3); color:rgba(255,255,255,.7);
-    }
+    .end-back:hover { color:rgba(255,255,255,.6); border-color:rgba(255,255,255,.3); }
 
     @media (max-width:600px){
       .page-nav { padding:max(28px, env(safe-area-inset-top, 28px)) 20px 14px; }
       .page-nav .nav-links { gap:14px; }
       .page-nav .nav-links a { font-size:.55rem; }
       .album-card { width:90vw; height:70vh; border-radius:10px; }
-      .reveal-container { width:90vw; height:70vh; border-radius:10px; }
     }
   </style>
 </head>
@@ -176,78 +116,52 @@
     </div>
   </nav>
 
-  <!-- PHASE 1: Swipeable photo album -->
+  <!-- Swipeable photo album -->
   <div id="albumScreen">
     <span class="swipe-hint">swipe to explore</span>
     <span class="album-counter" id="albumCounter"></span>
   </div>
 
-  <!-- PHASE 2: Password gate -->
-  <div id="passwordScreen">
-    <div class="pw-title">Private</div>
-    <input class="pw-input" id="pwInput" type="password" maxlength="6" placeholder="&bull;&bull;&bull;" autocomplete="off">
-    <div class="pw-error" id="pwError"></div>
-  </div>
-
-  <!-- PHASE 3: Blur-reveal gallery -->
-  <div id="revealScreen">
-    <div class="reveal-container" id="revealContainer">
-      <img id="revealImg" src="" alt="">
-      <canvas class="reveal-canvas" id="revealCanvas"></canvas>
-    </div>
-    <span class="reveal-hint">swipe to reveal</span>
-    <div class="reveal-nav">
-      <button id="revealPrev">&#8249;</button>
-      <button id="revealNext">&#8250;</button>
-    </div>
-    <span class="reveal-counter" id="revealCounter"></span>
+  <!-- End screen after all photos -->
+  <div id="endScreen">
+    <div class="end-title">That's all for now</div>
+    <a class="end-back" href="../">back to my life</a>
   </div>
 
   <script>
     /* ── PHOTO DATA ─────────────────────────── */
-    const scrollPhotos = [
-      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Photo%20Feb%2022%202026%2C%201%2031%2016%20AM.jpg',
-      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Photo%20Mar%2025%202026%2C%209%2055%2031%20PM%20(1).jpg',
-      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Photo%20Mar%2025%202026%2C%209%2055%2034%20PM.jpg',
-      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Photo%20Oct%2019%202025%2C%201%2006%2031%20AM.jpg'
-    ];
+    var photos = [];
+    for (var i = 1; i <= 33; i++) {
+      photos.push('../../assets/images/bio/see-more-of-me/' + i + '.jpg');
+    }
 
-    const privatePhotos = [
-      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Images%20behind%20pasword%20444/Photo%20Feb%2014%202026%2C%2010%2018%2000%20PM.jpg',
-      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Images%20behind%20pasword%20444/Photo%20Feb%2019%202026%2C%206%2058%2059%20PM.jpg',
-      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Images%20behind%20pasword%20444/Photo%20Nov%2019%202025%2C%209%2022%2024%20PM.jpg',
-      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Images%20behind%20pasword%20444/Photo%20Nov%2024%202025%2C%2010%2040%2007%20PM.jpg',
-      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Images%20behind%20pasword%20444/Photo%20Nov%2024%202025%2C%2011%2037%2003%20PM.jpg',
-      '../../Photos/Photo%20For%20A%20Look%20Into%20My%20Life/Scroll%20Photos/Images%20behind%20pasword%20444/Photo%20Nov%2024%202025%2C%2011%2057%2059%20PM.jpg'
-    ];
-
-    /* ── PHASE 1: SWIPEABLE ALBUM ───────────── */
-    const albumScreen = document.getElementById('albumScreen');
-    const albumCounter = document.getElementById('albumCounter');
-    let albumIdx = 0;
-    let cards = [];
-    let isDragging = false, startX = 0, startY = 0, dx = 0, dy = 0;
-    let throwing = false;
-    let boundMove = null, boundEnd = null;
+    /* ── SWIPEABLE ALBUM ────────────────────── */
+    var albumScreen = document.getElementById('albumScreen');
+    var albumCounter = document.getElementById('albumCounter');
+    var endScreen = document.getElementById('endScreen');
+    var albumIdx = 0;
+    var cards = [];
+    var isDragging = false, startX = 0, startY = 0, dx = 0, dy = 0;
+    var throwing = false;
+    var boundMove = null, boundEnd = null;
 
     function buildAlbum() {
-      scrollPhotos.forEach((src, i) => {
-        const card = document.createElement('div');
+      photos.forEach(function(src, i) {
+        var card = document.createElement('div');
         card.className = 'album-card';
-        card.style.zIndex = scrollPhotos.length - i;
-        // All cards stacked at full scale, only front visible
+        card.style.zIndex = photos.length - i;
         if (i > 0) card.style.opacity = '0';
         card.innerHTML = '<img src="' + src + '" alt="Photo ' + (i+1) + '">';
         albumScreen.insertBefore(card, albumCounter);
         cards.push(card);
       });
-      updateAlbumCounter();
+      updateCounter();
       attachSwipe();
     }
 
-    function updateAlbumCounter() {
-      albumCounter.textContent = albumIdx < scrollPhotos.length
-        ? (albumIdx + 1) + ' / ' + scrollPhotos.length : '';
+    function updateCounter() {
+      albumCounter.textContent = albumIdx < photos.length
+        ? (albumIdx + 1) + ' / ' + photos.length : '';
     }
 
     function cleanupSwipe() {
@@ -259,31 +173,30 @@
     function attachSwipe() {
       if (albumIdx >= cards.length || throwing) return;
       cleanupSwipe();
-      const card = cards[albumIdx];
+      var card = cards[albumIdx];
 
-      const onStart = (e) => {
+      var onStart = function(e) {
         if (throwing) return;
         isDragging = true;
-        const pt = e.touches ? e.touches[0] : e;
+        var pt = e.touches ? e.touches[0] : e;
         startX = pt.clientX; startY = pt.clientY;
         dx = 0; dy = 0;
         card.style.transition = 'none';
       };
 
-      boundMove = (e) => {
+      boundMove = function(e) {
         if (!isDragging) return;
-        const pt = e.touches ? e.touches[0] : e;
+        var pt = e.touches ? e.touches[0] : e;
         dx = pt.clientX - startX;
         dy = pt.clientY - startY;
-        const rot = dx * .08;
+        var rot = dx * .08;
         card.style.transform = 'translate(' + dx + 'px,' + dy + 'px) rotate(' + rot + 'deg)';
       };
 
-      boundEnd = () => {
+      boundEnd = function() {
         if (!isDragging) return;
         isDragging = false;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        // Very low threshold — slightest real swipe throws it
+        var dist = Math.sqrt(dx*dx + dy*dy);
         if (dist > 20) {
           throwCard(card, dx, dy);
         } else {
@@ -302,134 +215,37 @@
 
     function throwCard(card, dx, dy) {
       throwing = true;
-      const angle = Math.atan2(dy, dx);
-      const throwX = Math.cos(angle) * window.innerWidth * 1.8;
-      const throwY = Math.sin(angle) * window.innerHeight * 1.8;
-      const rot = dx * .2;
+      var angle = Math.atan2(dy, dx);
+      var throwX = Math.cos(angle) * window.innerWidth * 1.8;
+      var throwY = Math.sin(angle) * window.innerHeight * 1.8;
+      var rot = dx * .2;
       card.style.transition = 'transform .45s cubic-bezier(.23,1,.32,1), opacity .45s';
       card.style.transform = 'translate(' + throwX + 'px,' + throwY + 'px) rotate(' + rot + 'deg)';
       card.style.opacity = '0';
       card.style.pointerEvents = 'none';
 
-      // Wait for throw animation to fully finish before revealing next card
       card.addEventListener('transitionend', function handler(e) {
         if (e.propertyName !== 'transform') return;
         card.removeEventListener('transitionend', handler);
 
         albumIdx++;
-        updateAlbumCounter();
+        updateCounter();
         cleanupSwipe();
         throwing = false;
 
         if (albumIdx < cards.length) {
-          // Reveal next card (it was hidden behind)
           cards[albumIdx].style.transition = 'opacity .3s';
           cards[albumIdx].style.opacity = '1';
           attachSwipe();
         } else {
-          setTimeout(showPassword, 600);
+          setTimeout(function() {
+            albumScreen.style.display = 'none';
+            endScreen.style.display = 'flex';
+          }, 400);
         }
       });
     }
 
-    /* ── PHASE 2: PASSWORD ──────────────────── */
-    const passwordScreen = document.getElementById('passwordScreen');
-    const pwInput = document.getElementById('pwInput');
-    const pwError = document.getElementById('pwError');
-
-    function showPassword() {
-      albumScreen.style.display = 'none';
-      passwordScreen.style.display = 'flex';
-      pwInput.focus();
-    }
-
-    pwInput.addEventListener('input', () => {
-      pwError.textContent = '';
-      if (pwInput.value === '444') {
-        passwordScreen.style.opacity = '0';
-        passwordScreen.style.transition = 'opacity .6s';
-        setTimeout(showReveal, 600);
-      }
-    });
-    pwInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && pwInput.value !== '444') {
-        pwError.textContent = 'incorrect';
-        pwInput.value = '';
-      }
-    });
-
-    /* ── PHASE 3: BLUR-REVEAL ───────────────── */
-    const revealScreen = document.getElementById('revealScreen');
-    const revealImg = document.getElementById('revealImg');
-    const revealCanvas = document.getElementById('revealCanvas');
-    const revealCounter = document.getElementById('revealCounter');
-    const ctx = revealCanvas.getContext('2d');
-    let revealIdx = 0;
-
-    function showReveal() {
-      passwordScreen.style.display = 'none';
-      revealScreen.style.display = 'flex';
-      loadRevealPhoto(0);
-    }
-
-    function loadRevealPhoto(idx) {
-      revealIdx = idx;
-      revealImg.src = privatePhotos[idx];
-      revealCounter.textContent = (idx + 1) + ' / ' + privatePhotos.length;
-
-      // Wait for image to load then setup canvas frost
-      revealImg.onload = () => {
-        const container = document.getElementById('revealContainer');
-        const w = container.offsetWidth;
-        const h = container.offsetHeight;
-        revealCanvas.width = w;
-        revealCanvas.height = h;
-
-        // Draw blurred copy on canvas
-        ctx.filter = 'blur(28px)';
-        ctx.drawImage(revealImg, 0, 0, w, h);
-        ctx.filter = 'none';
-
-        // Add frosted tint overlay
-        ctx.fillStyle = 'rgba(0,0,0,.25)';
-        ctx.fillRect(0, 0, w, h);
-      };
-    }
-
-    // Touch/mouse reveal — erase canvas to show sharp image underneath
-    let isRevealing = false;
-    function revealAt(x, y) {
-      const rect = revealCanvas.getBoundingClientRect();
-      const cx = (x - rect.left) * (revealCanvas.width / rect.width);
-      const cy = (y - rect.top) * (revealCanvas.height / rect.height);
-      ctx.globalCompositeOperation = 'destination-out';
-      // Soft circular brush
-      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 50);
-      grad.addColorStop(0, 'rgba(0,0,0,1)');
-      grad.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 50, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalCompositeOperation = 'source-over';
-    }
-
-    revealCanvas.addEventListener('mousedown', (e) => { isRevealing = true; revealAt(e.clientX, e.clientY); });
-    revealCanvas.addEventListener('mousemove', (e) => { if (isRevealing) revealAt(e.clientX, e.clientY); });
-    window.addEventListener('mouseup', () => { isRevealing = false; });
-    revealCanvas.addEventListener('touchstart', (e) => { isRevealing = true; revealAt(e.touches[0].clientX, e.touches[0].clientY); }, {passive:true});
-    revealCanvas.addEventListener('touchmove', (e) => { if (isRevealing) revealAt(e.touches[0].clientX, e.touches[0].clientY); }, {passive:true});
-    window.addEventListener('touchend', () => { isRevealing = false; });
-
-    // Nav buttons
-    document.getElementById('revealPrev').addEventListener('click', () => {
-      if (revealIdx > 0) loadRevealPhoto(revealIdx - 1);
-    });
-    document.getElementById('revealNext').addEventListener('click', () => {
-      if (revealIdx < privatePhotos.length - 1) loadRevealPhoto(revealIdx + 1);
-    });
-
-    /* ── INIT ───────────────────────────────── */
     buildAlbum();
   </script>
 
