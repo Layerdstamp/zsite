@@ -338,6 +338,9 @@
   var FS = 6;              // frame spacing along Z
   var WALK_SPD = 0.12;
 
+  // Mobile detection for performance tuning
+  var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (window.innerWidth <= 768);
+
   var artworks = [
     {s:'../assets/images/art/self-portrait.jpeg',    t:'Self Portrait',       y:'2021'},
     {s:'../assets/images/art/fatherly-love.jpg',     t:'Fatherly Love',       y:'2021'},
@@ -486,11 +489,11 @@
   var rend = null;
   function initGalleryRenderer(){
     if(rend) return;
-    rend = new THREE.WebGLRenderer({canvas:$gal, antialias:true});
+    rend = new THREE.WebGLRenderer({canvas:$gal, antialias:!isMobile});
     rend.setSize(innerWidth, innerHeight);
-    rend.setPixelRatio(Math.min(devicePixelRatio, 2));
-    rend.shadowMap.enabled = true;
-    rend.shadowMap.type = THREE.PCFSoftShadowMap;
+    rend.setPixelRatio(Math.min(devicePixelRatio, isMobile ? 1 : 2));
+    rend.shadowMap.enabled = !isMobile;
+    if(!isMobile) rend.shadowMap.type = THREE.PCFSoftShadowMap;
   }
 
   var scene = new THREE.Scene();
@@ -532,9 +535,9 @@
   var dirLight = new THREE.DirectionalLight(0xffffff, 0.45);
   dirLight.position.set(0, HH - 0.2, 0);
   dirLight.target.position.set(0, 0, -10);
-  dirLight.castShadow = true;
-  dirLight.shadow.mapSize.width = 1024;
-  dirLight.shadow.mapSize.height = 1024;
+  dirLight.castShadow = !isMobile;
+  dirLight.shadow.mapSize.width = isMobile ? 512 : 1024;
+  dirLight.shadow.mapSize.height = isMobile ? 512 : 1024;
   scene.add(dirLight);
   scene.add(dirLight.target);
 
@@ -543,16 +546,21 @@
   var hallLen = artworks.length * FS/2 + 20;
   camZMax = -(hallLen - 6);
 
-  // Floor — glossy reflective white epoxy
-  var cubeRT = new THREE.WebGLCubeRenderTarget(256, {format:THREE.RGBFormat, generateMipmaps:true, minFilter:THREE.LinearMipmapLinearFilter});
-  var cubeCam = new THREE.CubeCamera(0.1, 50, cubeRT);
-  cubeCam.position.set(0, 0.05, -hallLen/4);
-  scene.add(cubeCam);
+  // Floor — glossy reflective white epoxy (simplified on mobile)
+  var cubeRT, cubeCam;
+  if(!isMobile){
+    cubeRT = new THREE.WebGLCubeRenderTarget(256, {format:THREE.RGBFormat, generateMipmaps:true, minFilter:THREE.LinearMipmapLinearFilter});
+    cubeCam = new THREE.CubeCamera(0.1, 50, cubeRT);
+    cubeCam.position.set(0, 0.05, -hallLen/4);
+    scene.add(cubeCam);
+  }
 
   var floorG = new THREE.PlaneGeometry(HW, hallLen);
-  var floorM = new THREE.MeshStandardMaterial({color:0x0a0a0a, roughness:0.08, metalness:0.4, envMap:cubeRT.texture, envMapIntensity:0.8});
+  var floorM = isMobile
+    ? new THREE.MeshStandardMaterial({color:0x0a0a0a, roughness:0.15, metalness:0.3, envMap:envTex, envMapIntensity:0.5})
+    : new THREE.MeshStandardMaterial({color:0x0a0a0a, roughness:0.08, metalness:0.4, envMap:cubeRT.texture, envMapIntensity:0.8});
   var floor = new THREE.Mesh(floorG, floorM);
-  var floorNeedsEnv = true;
+  var floorNeedsEnv = !isMobile;
   floor.rotation.x = -Math.PI/2;
   floor.position.set(0, 0, -hallLen/2+2);
   floor.receiveShadow = true;
@@ -590,8 +598,8 @@
   var hexBezelM = new THREE.MeshStandardMaterial({color:0x2a2a2a, roughness:0.4, metalness:0.6});
   var hexGlowM = new THREE.MeshStandardMaterial({color:0xffffff, emissive:0xffffff, emissiveIntensity:0.5, roughness:1});
 
-  var hexSpacingX = hexR * 1.82;
-  var hexSpacingZ = hexR * 2.1;
+  var hexSpacingX = hexR * (isMobile ? 3.6 : 1.82);
+  var hexSpacingZ = hexR * (isMobile ? 4.2 : 2.1);
   var hexCols = Math.floor(HW / hexSpacingX) - 1;
   var hexRows = Math.floor(hallLen / hexSpacingZ);
   var hexStartX = -(hexCols - 1) * hexSpacingX / 2;
@@ -616,8 +624,9 @@
   }
 
   // Point lights every few hexagons for even illumination
-  for(var li = 0; li < hallLen; li += 3){
-    var cLight = new THREE.PointLight(0xffffff, 0.18, 9, 2);
+  var pLightSpacing = isMobile ? 8 : 3;
+  for(var li = 0; li < hallLen; li += pLightSpacing){
+    var cLight = new THREE.PointLight(0xffffff, isMobile ? 0.3 : 0.18, isMobile ? 14 : 9, 2);
     cLight.position.set(0, HH - 0.3, 2 - li);
     scene.add(cLight);
   }
@@ -724,19 +733,21 @@
 
     // Wall-mounted spotlight per frame
     var sX = side==='left'? xP+1.8 : xP-1.8;
-    var sp = new THREE.SpotLight(0xffffff, 1.0, 12, Math.PI/5, 0.5, 1);
+    var sp = new THREE.SpotLight(0xffffff, isMobile ? 1.2 : 1.0, isMobile ? 8 : 12, Math.PI/5, 0.5, 1);
     sp.position.set(sX, HH-0.2, zP);
     sp.target.position.set(xP, FY, zP);
     scene.add(sp);
     scene.add(sp.target);
 
-    // Ceiling-mounted spotlight shining straight down onto artwork
-    var ceilSp = new THREE.SpotLight(0xffeedd, 0.7, 14, Math.PI/6, 0.6, 1);
-    var cSpX = side==='left' ? xP + 1.2 : xP - 1.2;
-    ceilSp.position.set(cSpX, HH - 0.05, zP);
-    ceilSp.target.position.set(xP, FY, zP);
-    scene.add(ceilSp);
-    scene.add(ceilSp.target);
+    // Ceiling-mounted spotlight shining straight down onto artwork (skip on mobile)
+    if(!isMobile){
+      var ceilSp = new THREE.SpotLight(0xffeedd, 0.7, 14, Math.PI/6, 0.6, 1);
+      var cSpX = side==='left' ? xP + 1.2 : xP - 1.2;
+      ceilSp.position.set(cSpX, HH - 0.05, zP);
+      ceilSp.target.position.set(xP, FY, zP);
+      scene.add(ceilSp);
+      scene.add(ceilSp.target);
+    }
   }
 
   // Point light that follows camera
@@ -1001,8 +1012,8 @@
     }
 
     if(phase==='gallery'){
-      // Capture floor reflections once
-      if(floorNeedsEnv && rend){
+      // Capture floor reflections once (desktop only)
+      if(floorNeedsEnv && rend && cubeCam){
         floor.visible = false;
         cubeCam.position.set(0, 0.05, camZ - 5);
         cubeCam.update(rend, scene);
