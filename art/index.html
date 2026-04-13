@@ -670,7 +670,30 @@
   scene.add(entW);
 
   // Frames + spotlights
-  var tl = new THREE.TextureLoader();
+  // Load artwork as power-of-two CanvasTexture for sharp rendering
+  function loadArtTex(src, cb) {
+    var img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function() {
+      // Resize to power-of-two canvas so Three.js r128 won't downscale
+      var sz = 2048;
+      var cvs = document.createElement('canvas');
+      cvs.width = sz; cvs.height = sz;
+      var ctx = cvs.getContext('2d');
+      // Cover-fit: fill canvas while preserving aspect ratio
+      var iw = img.width, ih = img.height;
+      var scale = Math.max(sz / iw, sz / ih);
+      var sw = iw * scale, sh = ih * scale;
+      ctx.drawImage(img, (sz - sw) / 2, (sz - sh) / 2, sw, sh);
+      var tex = new THREE.CanvasTexture(cvs);
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.anisotropy = rend ? rend.capabilities.getMaxAnisotropy() : 8;
+      tex.needsUpdate = true;
+      cb(tex);
+    };
+    img.src = src;
+  }
 
   function makeFrame(aw, x, y, z, rotY) {
     var grp = new THREE.Group();
@@ -701,16 +724,19 @@
     var matte=new THREE.Mesh(matG, matM);
     matte.position.z=fD/2-0.02; grp.add(matte);
 
-    // Artwork
-    var tex=tl.load(aw.s);
-    tex.minFilter=THREE.LinearFilter;
-    tex.generateMipmaps=false;
+    // Artwork — start with placeholder, swap in sharp texture when loaded
     var artG=new THREE.PlaneGeometry(aW-0.2, aH-0.2);
-    var artM=new THREE.MeshBasicMaterial({map:tex});
+    var artM=new THREE.MeshBasicMaterial({color:0x222222});
     var artMesh=new THREE.Mesh(artG, artM);
     artMesh.position.z=fD/2-0.01;
     artMesh.userData={title:aw.t, year:aw.y, src:aw.s, fz:z};
     grp.add(artMesh);
+
+    loadArtTex(aw.s, function(tex) {
+      artMesh.material.map = tex;
+      artMesh.material.color.set(0xffffff);
+      artMesh.material.needsUpdate = true;
+    });
 
     grp.position.set(x,y,z);
     grp.rotation.y=rotY;
