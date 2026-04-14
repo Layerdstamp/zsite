@@ -489,9 +489,9 @@
   var rend = null;
   function initGalleryRenderer(){
     if(rend) return;
-    rend = new THREE.WebGLRenderer({canvas:$gal, antialias:!isMobile});
+    rend = new THREE.WebGLRenderer({canvas:$gal, antialias:true});
     rend.setSize(innerWidth, innerHeight);
-    rend.setPixelRatio(Math.min(devicePixelRatio, isMobile ? 1 : 2));
+    rend.setPixelRatio(Math.min(devicePixelRatio, 2));
     rend.shadowMap.enabled = !isMobile;
     if(!isMobile) rend.shadowMap.type = THREE.PCFSoftShadowMap;
   }
