@@ -670,23 +670,23 @@
   scene.add(entW);
 
   // Frames + spotlights
-  // Load artwork as power-of-two CanvasTexture for sharp rendering
+  // Load artwork texture onto a power-of-two canvas to prevent
+  // Three.js r128 from auto-downscaling non-power-of-two images.
+  // Image fills the entire canvas (same as how UV maps onto the frame plane).
   function loadArtTex(src, cb) {
     var img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = function() {
-      // Round each dimension up to next power of two
-      function pot(v) { var p = 1; while (p < v) p *= 2; return p; }
-      var w = pot(img.width), h = pot(img.height);
+      function npot(v) { var p = 1; while (p < v) p *= 2; return p; }
+      var pw = npot(img.width), ph = npot(img.height);
       var cvs = document.createElement('canvas');
-      cvs.width = w; cvs.height = h;
+      cvs.width = pw; cvs.height = ph;
       var ctx = cvs.getContext('2d');
-      // Draw full image stretched to fill — no cropping
-      ctx.drawImage(img, 0, 0, w, h);
+      ctx.drawImage(img, 0, 0, pw, ph);
       var tex = new THREE.CanvasTexture(cvs);
-      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.generateMipmaps = false;
+      tex.minFilter = THREE.LinearFilter;
       tex.magFilter = THREE.LinearFilter;
-      tex.anisotropy = rend ? rend.capabilities.getMaxAnisotropy() : 8;
       tex.needsUpdate = true;
       cb(tex);
     };
