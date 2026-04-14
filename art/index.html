@@ -342,16 +342,16 @@
   var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (window.innerWidth <= 768);
 
   var artworks = [
-    {s:'../assets/images/art/let-them-eat-cake-1.jpg', t:'Let Them Eat C.',    y:'2024'},
-    {s:'../assets/images/art/fashion-standards-1.jpeg',t:'Fashion Standards',  y:'2024'},
-    {s:'../assets/images/art/dead-mother.jpg',       t:'Dead Mother',         y:'2021'},
-    {s:'../assets/images/art/femme-fatale-skirt.jpeg',t:'Femme Fatale Skirt', y:'2022'},
-    {s:'../assets/images/art/teapot-set.jpeg',       t:'Teapot Set',          y:'2023'},
-    {s:'../assets/images/art/wild-cherry.jpg',       t:'Wild Cherry',         y:'2023'},
-    {s:'../assets/images/art/sun-trails-1.jpeg',     t:'Sun Trails Series',   y:'2023'},
-    {s:'../assets/images/art/butterfly-locket-1.jpeg',t:'Butterfly Locket',   y:'2024'},
-    {s:'../assets/images/art/fidget-ring.jpeg',      t:'Fidget Ring',         y:'2024'},
-    {s:'../assets/images/art/self-portrait.jpeg',      t:'Self Portrait',       y:'2021'}
+    {s:'../assets/images/art/let-them-eat-cake-1.jpg', t:'Let Them Eat C.',    y:'2024', ar:1200/1960},
+    {s:'../assets/images/art/fashion-standards-1.jpeg',t:'Fashion Standards',  y:'2024', ar:859/1144},
+    {s:'../assets/images/art/dead-mother.jpg',       t:'Dead Mother',         y:'2021', ar:1525/1016},
+    {s:'../assets/images/art/femme-fatale-skirt.jpeg',t:'Femme Fatale Skirt', y:'2022', ar:859/1236},
+    {s:'../assets/images/art/teapot-set.jpeg',       t:'Teapot Set',          y:'2023', ar:859/514},
+    {s:'../assets/images/art/wild-cherry.jpg',       t:'Wild Cherry',         y:'2023', ar:860/1125},
+    {s:'../assets/images/art/sun-trails-1.jpeg',     t:'Sun Trails Series',   y:'2023', ar:860/603},
+    {s:'../assets/images/art/butterfly-locket-1.jpeg',t:'Butterfly Locket',   y:'2024', ar:1},
+    {s:'../assets/images/art/fidget-ring.jpeg',      t:'Fidget Ring',         y:'2024', ar:1},
+    {s:'../assets/images/art/self-portrait.jpeg',      t:'Self Portrait',       y:'2021', ar:1800/1200}
   ];
 
   /* ═══════════════════════════════════════════════
@@ -695,7 +695,18 @@
 
   function makeFrame(aw, x, y, z, rotY) {
     var grp = new THREE.Group();
-    var aW=1.8, aH=1.4, bW=0.12, fD=0.1;
+    // Compute frame size from image aspect ratio — fit within max 1.8 wide × 1.4 tall
+    var maxW=1.8, maxH=1.4;
+    var ar = aw.ar || (maxW/maxH); // width/height ratio
+    var aW, aH;
+    if (ar >= maxW/maxH) {
+      // Landscape or wide — fill width, shrink height
+      aW = maxW; aH = maxW / ar;
+    } else {
+      // Portrait or tall — fill height, shrink width
+      aH = maxH; aW = maxH * ar;
+    }
+    var bW=0.12, fD=0.1;
     var fMat = new THREE.MeshStandardMaterial({color:0x1a1a1a, roughness:0.35, metalness:0.5});
 
     // Border pieces
